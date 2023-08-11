@@ -13,6 +13,7 @@
 
 // Include common definitions from above.
 apply from: '../build.common.gradle'
+apply plugin: 'kotlin-android'
 apply from: '../build.dependencies.gradle'
 
 android {
@@ -25,5 +26,9 @@ android {
 
 dependencies {
     implementation project(':FtcRobotController')
+    testImplementation 'junit:junit:4.12'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
+}
+repositories {
+    mavenCentral()
 }
