@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.thundercoreV2.utils;
 
+import org.checkerframework.checker.units.qual.min;
+
 /** Utility class full of various static methods
  *
  * @author TheConverseEngineer
@@ -29,6 +31,15 @@ public class Utils {
      */
     public static double getMsTime() {
         return System.nanoTime() / 1e6;
+    }
+
+    /** Returns the inputted value, but clamped between the specified min and max values
+     * If the inputted value is less than min, min will be returned.
+     * If the inputted value is greater than max, max will be returned.
+     *
+     */
+    public static double clamp(double value, double min, double max) {
+        return Math.min(max, Math.max(value, min));
     }
 
 }

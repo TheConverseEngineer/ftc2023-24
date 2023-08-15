@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public abstract class VirtualHardwareDevice implements HardwareDevice {
+
     private final String deviceName;
     protected final MessageReceiver messageReceiver;
     private final byte[] deviceByteName;
@@ -27,14 +28,32 @@ public abstract class VirtualHardwareDevice implements HardwareDevice {
         messageReceiver.receiveMessage(fullMsg);
     }
 
+    protected byte[] sendMessageWithReply(byte[]... msg) {
+        // doing this the long way because I don't want to have to deal with byte to Byte conversions.
+        int combinedSize = 0; for (byte[] arr : msg) combinedSize += arr.length;
+
+        byte[] fullMsg = new byte[combinedSize];
+        int offset = 0;
+        for (byte[] arr : msg) {
+            System.arraycopy(arr, 0, fullMsg, offset, arr.length);
+            offset += arr.length;
+        }
+
+        return messageReceiver.receiveMessageWithReply(fullMsg);
+    }
+
     // Some convenience methods
+    protected static int decodeToInt(byte[] bytes) {
+        return (((int)bytes[0])<<24) + (((int)bytes[1])<<16) + (((int)bytes[2])<<8) + ((int)bytes[3]);
+    }
+
     protected static byte[] encode(int x) {
         return new byte[]{(byte) (x>>24), (byte) (x>>16), (byte) (x>>8), (byte) x};
     }
 
     protected static byte[] encode(float x) {
         int intBits = Float.floatToIntBits(x);
-        return new byte[]{(byte) (intBits>>24), (byte) (intBits>>16), (byte) (intBits>>8), (byte) intBits};
+        return new byte[]{(byte) (intBits), (byte) (intBits>>8), (byte) (intBits>>16), (byte) (intBits>>24)};
     }
 
     protected static byte[] encode(double x) { return encode((float) x); }
@@ -45,6 +64,10 @@ public abstract class VirtualHardwareDevice implements HardwareDevice {
 
     protected final byte[] getByteName() {
         return this.deviceByteName;
+    }
+
+    protected final void throwDeprecatedError(String funcName) {
+        throw new UnsupportedOperationException("[FTC-SIM] Function " + funcName + " is not supported, as it is deprecated.");
     }
 
     // And now for usable methods

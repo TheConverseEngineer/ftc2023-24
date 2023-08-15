@@ -3,24 +3,52 @@ package org.firstinspires.ftc.teamcode.skecore.hardware;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ServoController;
 
-public class VirtualCRServo implements CRServo {
-    private double currentPower = 0.0;
-    private Direction currentDirection = Direction.FORWARD;
+import org.firstinspires.ftc.teamcode.skecore.MessageCodes;
+import org.firstinspires.ftc.teamcode.skecore.MessageReceiver;
 
-    @Override public ServoController getController() { return null; }
-    @Override public int getPortNumber() { return 0; }
+public class VirtualCRServo extends VirtualHardwareDevice implements CRServo {
+    private Direction direction = Direction.FORWARD;
+    private double power = 0;
 
-    @Override public void setDirection(Direction direction) { this.currentDirection = direction; }
-    @Override public Direction getDirection() { return this.currentDirection; }
+    public VirtualCRServo(String deviceName, MessageReceiver messageReceiver) {
+        super(deviceName, messageReceiver);
+    }
 
-    @Override public void setPower(double power) { this.currentPower = power; }
-    @Override public double getPower() { return currentPower; }
+    @Override
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+        setPower(power);
+    }
 
-    // Hardware device methods
-    @Override public Manufacturer getManufacturer() { return Manufacturer.Other; }
-    @Override public String getDeviceName() { return "Virtual Servo"; }
-    @Override public String getConnectionInfo() { return "Connected Virtually"; }
-    @Override public int getVersion() { return 0; }
-    @Override public void resetDeviceConfigurationForOpMode() { }
-    @Override public void close() { }
+    @Override
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public void setPower(double power) {
+        this.power = power;
+        sendMessage(MessageCodes.SET_MOTOR_POWER, this.getByteName(), encode((direction==Direction.FORWARD?1:-1)*power));
+    }
+
+    @Override
+    public double getPower() {
+        return power;
+    }
+
+    @Override
+    public void resetDeviceConfigurationForOpMode() {
+        this.direction = Direction.FORWARD;
+        setPower(0);
+    }
+
+    @Override
+    public ServoController getController() {
+        return null;
+    }
+
+    @Override
+    public int getPortNumber() {
+        return 0;
+    }
 }

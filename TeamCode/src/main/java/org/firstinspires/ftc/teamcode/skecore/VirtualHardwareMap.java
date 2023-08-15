@@ -1,12 +1,16 @@
 package org.firstinspires.ftc.teamcode.skecore;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.SerialNumber;
 
+import org.firstinspires.ftc.teamcode.skecore.hardware.VirtualDcMotor;
 import org.firstinspires.ftc.teamcode.skecore.hardware.VirtualDcMotorSimple;
 import org.firstinspires.ftc.teamcode.skecore.hardware.VirtualHardwareDevice;
+import org.firstinspires.ftc.teamcode.skecore.hardware.VirtualServo;
 import org.firstinspires.ftc.teamcode.thundercoreV2.utils.Pair;
 
 import java.util.HashMap;
@@ -38,6 +42,8 @@ public class VirtualHardwareMap extends HardwareMap {
 
         interfaceToImplementation = new HashMap<>();
         interfaceToImplementation.put(DcMotorSimple.class, VirtualDcMotorSimple::new);
+        interfaceToImplementation.put(DcMotor.class, VirtualDcMotor::new);
+        interfaceToImplementation.put(Servo.class, VirtualServo::new);
     }
 
     public <T> T get(Class<? extends T> classOrInterface, SerialNumber serialNumber) {
