@@ -11,7 +11,7 @@ public class VirtualDcMotor extends VirtualDcMotorSimple implements DcMotor {
 
     private int offset = 0;
     private ZeroPowerBehavior zeroPowerBehavior = ZeroPowerBehavior.FLOAT;
-    private MotorConfigurationType motorType = MotorConfigurationType.getUnspecifiedMotorType();
+    //private MotorConfigurationType motorType = MotorConfigurationType.getUnspecifiedMotorType();
 
     public VirtualDcMotor(String deviceName, MessageReceiver messageReceiver) {
         super(deviceName, messageReceiver);
@@ -20,7 +20,7 @@ public class VirtualDcMotor extends VirtualDcMotorSimple implements DcMotor {
     public void resetDeviceConfigurationForOpMode() {
         offset = 0;
         zeroPowerBehavior = ZeroPowerBehavior.FLOAT;
-        motorType = MotorConfigurationType.getUnspecifiedMotorType();
+        //motorType = MotorConfigurationType.getUnspecifiedMotorType();
     }
 
     @Override
@@ -57,8 +57,8 @@ public class VirtualDcMotor extends VirtualDcMotorSimple implements DcMotor {
         }
     }
     @Override public RunMode getMode() { return RunMode.RUN_WITHOUT_ENCODER; }
-    @Override public void setMotorType(MotorConfigurationType motorType) { this.motorType = motorType; }
-    @Override public MotorConfigurationType getMotorType() { return motorType; }
+    @Override public void setMotorType(MotorConfigurationType motorType) { }
+    @Override public MotorConfigurationType getMotorType() { return null; }
 
 
     private void throwNotInModeError(String funcName, RunMode mode)  {

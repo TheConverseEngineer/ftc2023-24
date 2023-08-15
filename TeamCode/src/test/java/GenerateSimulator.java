@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
@@ -227,13 +228,13 @@ public class GenerateSimulator {
     private static final class SocketClient implements MessageReceiver {
         private Socket client;
         private BufferedOutputStream output;
-        private BufferedReader input;
+        private DataInputStream input;
 
         public void startConnection(String ip, int port) {
             try {
                 client = new Socket(ip, port);
                 output = new BufferedOutputStream(client.getOutputStream());
-                input = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                input = new DataInputStream(client.getInputStream());
             } catch (IOException e) {
                 throw new RuntimeException("[FTC-SIM] Error: " + e.getMessage());
             }
@@ -246,7 +247,14 @@ public class GenerateSimulator {
 
         @Override
         public byte[] receiveMessageWithReply(byte[] msg) {
-            return new byte[0];
+            this.sendMessage(msg);
+            byte[] response = new byte[4];
+            try {
+                input.readFully(response);
+            } catch (IOException e) {
+                System.out.println("[FTC-SIM] Error reading input: " + e.getMessage());
+            }
+            return response;
         }
 
         private void sendMessage(byte[] msg) {
