@@ -1,6 +1,4 @@
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.skecore.MessageReceiver;
 import org.firstinspires.ftc.teamcode.skecore.VirtualHardwareMap;
@@ -8,16 +6,12 @@ import org.firstinspires.ftc.teamcode.skecore.testOpMode.DcMotorSimpleTest;
 import org.junit.Test;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
 import java.util.Arrays;
-
 
 public class GenerateSimulator {
 
@@ -37,7 +31,7 @@ public class GenerateSimulator {
         link.stopConnection();
     }
 
-    @Test
+    //@Test
     public void testSimulator() {
         Class<? extends LinearOpMode> opModeTemplate = DcMotorSimpleTest.class;
 

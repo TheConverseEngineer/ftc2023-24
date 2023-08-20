@@ -10,6 +10,7 @@ public class DcMotorSimpleTest extends LinearOpMode {
     public void runOpMode() {
         DcMotor arm = hardwareMap.get(DcMotor.class, "armMotor");
         DcMotorSimple motor = hardwareMap.get(DcMotorSimple.class, "motor");
+        DcMotor arm2 = hardwareMap.get(DcMotor.class, "armMotor2");
         motor.setPower(0.8);
         arm.setPower(0.3);
 
@@ -20,5 +21,7 @@ public class DcMotorSimpleTest extends LinearOpMode {
         System.out.println("Motor pos:" + arm.getCurrentPosition());
         motor.setPower(0);
         arm.setPower(0);
+
+
     }
 }
