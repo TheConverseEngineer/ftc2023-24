@@ -31,7 +31,7 @@ public class Logger {
         Vector2d p2 = position.plus(vector);
         currentPacket.fieldOverlay()
                 .setStroke(color)
-                .setStrokeWidth(2)
+                .setStrokeWidth(1)
                 .strokeLine(position.getX(), position.getY(), p2.getX(), p2.getY())
                 .strokeLine(p2.getX(), p2.getY(), p2.getX() + arrowLen*Math.cos(arrowAngle+0.35), p2.getY() + arrowLen*Math.sin(arrowAngle+0.35))
                 .strokeLine(p2.getX(), p2.getY(), p2.getX() + arrowLen*Math.cos(arrowAngle-0.35), p2.getY() + arrowLen*Math.sin(arrowAngle-0.35));
@@ -41,22 +41,23 @@ public class Logger {
     public void drawRobot(Vector2d position, double heading, String color, Double radius) {
         currentPacket.fieldOverlay()
                 .setStroke(color)
-                .setStrokeWidth(2)
+                .setStrokeWidth(1)
                 .strokeLine(position.getX(), position.getY(), position.getX() + radius*Math.cos(heading), position.getY() + radius*Math.sin(heading))
                 .strokeCircle(position.getX(), position.getY(), radius);
     }
 
     public void drawPath(Path path, String color) {
-        double[] xPoints = new double[101];
-        double[] yPoints = new double[101];
-        for (int i = 0; i <= 100; i++) {
-            Vector2d point = path.atParameter(i/100.0).getVector();
+        int res = Math.max((int)path.getLength() / 5, 10);
+        double[] xPoints = new double[res+1];
+        double[] yPoints = new double[res+1];
+        for (int i = 0; i <= res; i++) {
+            Vector2d point = path.atParameter(i/(double)res).getVector();
             xPoints[i] = point.getX();
             yPoints[i] = point.getY();
         }
         currentPacket.fieldOverlay()
                 .setStroke(color)
-                .setStrokeWidth(2)
-                .strokePolygon(xPoints, yPoints);
+                .setStrokeWidth(1)
+                .strokePolyline(xPoints, yPoints);
     }
 }

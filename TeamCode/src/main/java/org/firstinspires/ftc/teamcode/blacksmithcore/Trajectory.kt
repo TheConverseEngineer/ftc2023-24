@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.blacksmithcore
+import android.util.Log
 import org.firstinspires.ftc.teamcode.thundercoreV2.utils.Utils.safeAssert
 import kotlin.math.cos
 import kotlin.math.sin
@@ -88,9 +89,9 @@ class Trajectory(
 
     fun getDuration() = profilePoints[resolution].getTime()
 
-    fun getGlobalRobotVelocityAtTime(t: Double) : Vector2d {
+    fun getGlobalRobotTargetAtTime(t: Double) : TrajectoryState {
         // First binary search to find the correct profile point
-        val (disp, v) = getDisplacementAndVelocityAtTime(t) // binary search #1
+        val (disp, v, omega) = getDisplacementAndVelocityAtTime(t) // binary search #1
         val u = path.getParameterAtDisplacement(disp) // binary search #2
 
         val point = path.atParameter(u)
@@ -100,29 +101,36 @@ class Trajectory(
                 square(differentialShift(differentialShift(point.y)/tangentMag)))
         val curvature: Double = normalMag.x/tangentMag.x
 
-        val tangentUnitVector = Vector2d(point.x.dx, point.y.dx)
-        val normalUnitVector  = Vector2d((differentialShift(point.x)/tangentMag).dx, (differentialShift(point.y)/tangentMag).dx)
+        val tangentUnitVector = Vector2d(point.x.dx, point.y.dx)/tangentMag.x
+        val normalUnitVector  = Vector2d((differentialShift(point.x)/tangentMag).dx, (differentialShift(point.y)/tangentMag).dx)/normalMag.x
 
-        return tangentUnitVector*(mecConfig.Kt*v) + normalUnitVector*(mecConfig.Kc*v*v*curvature)
+        return TrajectoryState(
+            point.getVector(),
+            tangentUnitVector*(mecConfig.Kt*v) + normalUnitVector*(mecConfig.Kc*v*v*curvature),
+            path.getHeadingAtParameter(u),
+            omega*v
+        )
+
     }
 
-    private fun getDisplacementAndVelocityAtTime(t: Double) : Pair<Double, Double> { // displacement, velocity
+    private fun getDisplacementAndVelocityAtTime(t: Double) : Triple<Double, Double, Double> { // displacement, velocity, omega
         var index = profilePoints.binarySearch(JustTimeProfilePoint(t))
         if (index < 0) index = -index - 1
 
-        return if (index == 0) Pair(0.0, profilePoints[0].getCurrentMaxVel())
-        else if (index >= resolution) Pair(0.0, profilePoints[resolution].getCurrentMaxVel())
-        else Pair((index - 1)*sampleDist +
+        return if (index == 0) Triple(0.0, profilePoints[0].getCurrentMaxVel(), 0.0)
+        else if (index >= resolution) Triple(pathLength, profilePoints[resolution].getCurrentMaxVel(), 0.0)
+        else Triple((index - 1)*sampleDist +
             0.5*(profilePoints[index].getCurrentMaxVel() + profilePoints[index-1].getCurrentMaxVel()) * (t-profilePoints[index-1].getTime()),
             profilePoints[index-1].getCurrentMaxVel() +
                     (profilePoints[index].getCurrentMaxVel() - profilePoints[index-1].getCurrentMaxVel())*(t - profilePoints[index-1].getTime())/
-                    (profilePoints[index].getTime() - profilePoints[index-1].getTime())
+                    (profilePoints[index].getTime() - profilePoints[index-1].getTime()),
+            profilePoints[index-1].getOmega()
         )
     }
 
 }
 
-abstract class ProfilePoint {
+abstract class ProfilePoint : Comparable<ProfilePoint> {
     abstract fun getCurrentMaxVel() : Double
 
     abstract fun setNewMaxVel(maxVel: Double)
@@ -133,7 +141,9 @@ abstract class ProfilePoint {
 
     abstract fun getTime() : Double
 
-    operator fun compareTo(other: ProfilePoint) : Int {
+    abstract fun getOmega(): Double
+
+    override operator fun compareTo(other: ProfilePoint) : Int {
         return getTime().compareTo(other.getTime())
     }
 }
@@ -169,16 +179,20 @@ class ProfilePointImpl (
                                 square(differentialShift(differentialShift(point.y)/tangentMag)))
         curvature = normalMag.x/tangentMag.x
 
-        val tangentUnitVector = Vector2d(point.x.dx, point.y.dx)
-        val normalUnitVector  = Vector2d((differentialShift(point.x)/tangentMag).dx, (differentialShift(point.y)/tangentMag).dx)
+        val tangentUnitVector = Vector2d(point.x.dx, point.y.dx)/tangentMag.x
+        val normalUnitVector  = Vector2d((differentialShift(point.x)/tangentMag).dx, (differentialShift(point.y)/tangentMag).dx)/normalMag.x
         val directionVector   = Vector2d(cos(robotHeading), sin(robotHeading))
 
         velocity = unboundedBinarySearch(
             {v: Double ->
                 val globalPower = tangentUnitVector*(mecConfig.Kt*v) + normalUnitVector*(mecConfig.Kc*v*v*curvature)
                 val localPower  = Vector2d(globalPower dot directionVector, globalPower cross directionVector)
-                abs(localPower.y) + abs(localPower.x)*mecConfig.Kl + abs(mecConfig.drivetrainMu*omega*v) > mecConfig.maxWheelSpeed
+                (abs(localPower.y) + abs(localPower.x)*mecConfig.Kl + abs(mecConfig.drivetrainMu*omega*v)) > mecConfig.maxWheelSpeed
             }, precision)
+        val globalPower = tangentUnitVector*(mecConfig.Kt*velocity) + normalUnitVector*(mecConfig.Kc*velocity*velocity*curvature)
+        val localPower  = Vector2d(globalPower dot directionVector, globalPower cross directionVector)
+        val mp = (abs(localPower.y) + abs(localPower.x)*mecConfig.Kl + abs(mecConfig.drivetrainMu*omega*velocity))
+        Log.d("BSC", "Velocity: $velocity, $mp, ${localPower.magnitude()}")
     }
 
     override fun getCurrentMaxVel() = velocity
@@ -190,6 +204,8 @@ class ProfilePointImpl (
     override fun setTime(t: Double) { time = t}
 
     override fun getTime() = time
+
+    override fun getOmega() = omega
 }
 
 class JustTimeProfilePoint(private var time: Double) : ProfilePoint() {
@@ -202,4 +218,6 @@ class JustTimeProfilePoint(private var time: Double) : ProfilePoint() {
     override fun setTime(t: Double) { time = t}
 
     override fun getTime() = time
+
+    override fun getOmega() = 0.0
 }

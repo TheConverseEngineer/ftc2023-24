@@ -46,8 +46,8 @@ class CompoundPath(private val paths: Array<Path>) : Path {
         if (index < 0) index = -index - 1
 
         return if (index == 0) 0.0
-        else if (index >= paths.size) 1.0
-        else paths[index-1].getParameterAtDisplacement(d - lengths[index-1])/paths.size + ((index-1)/paths.size)
+        else if (index > paths.size) 1.0
+        else paths[index-1].getParameterAtDisplacement(d - lengths[index-1])/paths.size + ((index-1).toDouble()/paths.size)
     }
 
 }
@@ -78,7 +78,7 @@ class PathSegment(
 
         return if (index == 0) 0.0
         else if (index >= precision) 1.0
-        else distanceLookup[index-1] + ((d-distanceLookup[index-1])/(distanceLookup[index]-distanceLookup[index-1]))/precision
+        else (index-1).toDouble()/precision + ((d-distanceLookup[index-1])/(distanceLookup[index]-distanceLookup[index-1]))/precision
     }
 
     override fun getMaxVelAtParameter(u: Double) = maxVel

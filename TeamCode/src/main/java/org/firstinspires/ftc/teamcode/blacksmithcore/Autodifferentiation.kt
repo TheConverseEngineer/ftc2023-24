@@ -6,6 +6,11 @@ import kotlin.math.sqrt
  */
 class SplineParameter
 
+/** Empty class used as a generic for the Variable class
+ *  Represents the time
+ */
+class TimeParameter
+
 /** Immutable representation of a differentiable variable in Kotlin
  *  In addition to the value itself, the numerical first and second derivatives of the variable are also stored.
  *
@@ -36,7 +41,7 @@ fun <T> sqrt(v: Variable<T>) : Variable<T> {
 }
 
 /** Returns the square root of the inputted variable */
-fun <T> square(v: Variable<T>) = v*v;
+fun <T> square(v: Variable<T>) = v*v
 
 /** Simulates differentiating a variable. Note that this just shifts the dx and ddx values. The returned ddx value is always 0. */
 fun <T> differentialShift(v: Variable<T>) = Variable<T>(v.dx, v.ddx, 0.0)
