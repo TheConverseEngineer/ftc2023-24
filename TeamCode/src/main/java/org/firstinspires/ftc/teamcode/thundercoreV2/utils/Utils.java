@@ -42,4 +42,13 @@ public class Utils {
         return Math.min(max, Math.max(value, min));
     }
 
+    /** Returns the inputted value, but clamped between the specified min and max values
+     * If the inputted value is less than min, min will be returned.
+     * If the inputted value is greater than max, max will be returned.
+     *
+     */
+    public static int clamp(int value, int min, int max) {
+        return Math.min(max, Math.max(value, min));
+    }
+
 }
