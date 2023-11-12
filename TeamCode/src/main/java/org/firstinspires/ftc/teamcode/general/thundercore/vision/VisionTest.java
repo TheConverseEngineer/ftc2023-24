@@ -39,7 +39,6 @@ public class VisionTest extends LinearOpMode {
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
                 .addProcessor(aprilTagProcessor)
-                .enableCameraMonitoring(true)
                 .setAutoStopLiveView(true)
                 .build();
 
