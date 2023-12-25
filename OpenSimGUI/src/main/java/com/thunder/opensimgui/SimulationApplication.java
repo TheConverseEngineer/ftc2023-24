@@ -14,6 +14,7 @@ public class SimulationApplication extends Application {
     private final PanelBase[] panels = new PanelBase[]{
             new MotorStatsPanel(new Point(200, 200)),
             new FieldMapPanel(new Point(400, 400)),
+            new OpModeControlPanel(new Point(600, 600))
     };
     private final SimulationLogicHandler handler;
 
@@ -37,9 +38,6 @@ public class SimulationApplication extends Application {
     @Override
     public void process() {
         SimulationInput input = handler.update();
-
-        ImGui.text("Hello, World!");
-        ImGui.button("press me!");
 
         for (PanelBase panel : panels) panel.show(input);
     }

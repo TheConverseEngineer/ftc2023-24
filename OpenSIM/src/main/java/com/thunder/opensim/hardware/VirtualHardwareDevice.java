@@ -1,4 +1,4 @@
-package com.thunder.opensim;
+package com.thunder.opensim.hardware;
 
 import com.qualcomm.robotcore.hardware.HardwareDevice;
 
@@ -17,4 +17,12 @@ public class VirtualHardwareDevice implements HardwareDevice {
 
     @Override public void resetDeviceConfigurationForOpMode() { }
     @Override public void close() { }
+
+    protected void throwUnsupported(String name) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("OpenSim does not support method " + name + " at this time!");
+    }
+
+    protected void throwUnsupportedParam(String funcName, String paramName) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("OpenSim does not support using the method " + funcName + " with the parameter " + " at this time!");
+    }
 }

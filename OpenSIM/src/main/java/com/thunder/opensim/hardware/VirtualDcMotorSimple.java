@@ -1,6 +1,7 @@
-package com.thunder.opensim;
+package com.thunder.opensim.hardware;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.thunder.opensim.MathUtils;
 
 public class VirtualDcMotorSimple extends VirtualHardwareDevice implements DcMotorSimple {
 
@@ -11,6 +12,13 @@ public class VirtualDcMotorSimple extends VirtualHardwareDevice implements DcMot
 
     public VirtualDcMotorSimple(String deviceName) {
         super(deviceName);
+    }
+
+    @Override
+    public void resetDeviceConfigurationForOpMode() {
+        super.resetDeviceConfigurationForOpMode();
+        this.power = 0;
+        this.direction = Direction.FORWARD;
     }
 
     @Override public void setDirection(Direction direction) { this.direction = direction; }
