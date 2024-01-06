@@ -18,9 +18,13 @@ public class SimulationApplication extends Application {
     };
     private final SimulationLogicHandler handler;
 
+    private long lastLoopTime;
+
 
     public SimulationApplication(SimulationLogicHandler handler) {
         this.handler = handler;
+        System.out.println("Launching application");
+        launch(this);
     }
 
     @Override
@@ -31,14 +35,18 @@ public class SimulationApplication extends Application {
     @Override
     protected void initWindow(Configuration config) {
         super.initWindow(config);
+        lastLoopTime = System.nanoTime();
 
         ImGuiViewport viewport = new ImGuiViewport(handle);
     }
 
     @Override
     public void process() {
-        SimulationInput input = handler.update();
+        long dTime = System.nanoTime() - lastLoopTime;
+        lastLoopTime += dTime;
 
-        for (PanelBase panel : panels) panel.show(input);
+        SimulationInput input = handler.update((double) dTime/1e6);
+
+        for (PanelBase panel : panels) panel.show(input, handler);
     }
 }

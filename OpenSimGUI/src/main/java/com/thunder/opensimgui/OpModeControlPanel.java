@@ -18,27 +18,31 @@ public class OpModeControlPanel extends PanelBase {
 
     @SuppressWarnings("DefaultLocale")
     @Override
-    public void populateInternal(SimulationInput input) {
+    public void populateInternal(SimulationInput input, SimulationLogicHandler handler) {
         ImGui.text("Current state: " + currentState.name());
         if (currentState == OpModeState.STOPPED) {
             if (ImGui.button("Initialize")) {
                 currentState = OpModeState.INITIATED;
+                handler.init();
             }
 
         } else if (currentState == OpModeState.INITIATED) {
             if (ImGui.button("Start")) {
                 currentState = OpModeState.RUNNING;
                 lastStartTimeMs = System.currentTimeMillis();
+                handler.start();
             }
 
             ImGui.sameLine();
             if (ImGui.button("Stop")) {
                 currentState = OpModeState.STOPPED;
+                handler.stop();
             }
 
         } else {
             if (ImGui.button("Stop")) {
                 currentState = OpModeState.STOPPED;
+                handler.stop();
             }
             ImGui.text(String.format("Runtime: %,.3f", (System.currentTimeMillis() - lastStartTimeMs)/1000d));
         }

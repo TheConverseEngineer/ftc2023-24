@@ -5,7 +5,7 @@ import com.thunder.opensimgui.input.SimulationInput;
 public interface SimulationLogicHandler {
 
     /** When called, this method should return the most recent hardware stats. This method will be called automatically */
-    SimulationInput update();
+    SimulationInput update(double dTime);
 
     /** Called when the user hits init */
     void init();

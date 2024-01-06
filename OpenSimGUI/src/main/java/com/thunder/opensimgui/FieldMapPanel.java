@@ -19,7 +19,7 @@ public class FieldMapPanel extends PanelBase {
     }
 
     @Override
-    public void populateInternal(SimulationInput input) {
+    public void populateInternal(SimulationInput input, SimulationLogicHandler handler) {
         ImPlot.setNextPlotLimitsX(-75, 75, ImGuiCond.None);
         ImPlot.setNextPlotLimitsY(-75, 75, ImGuiCond.None);
         if (ImPlot.beginPlot("Field", "Driver Station Side", "Backdrop Side", new ImVec2(525, 525))) {

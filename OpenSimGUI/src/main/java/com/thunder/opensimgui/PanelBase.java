@@ -16,13 +16,13 @@ public abstract class PanelBase {
         this.name = name;
     }
 
-    public abstract void populateInternal(SimulationInput input);
+    public abstract void populateInternal(SimulationInput input, SimulationLogicHandler handler);
 
-    public final void show(SimulationInput input) {
+    public final void show(SimulationInput input, SimulationLogicHandler handler) {
         ImGui.setNextWindowSize(size.x, size.y, ImGuiCond.Once);
         ImGui.setNextWindowPos(pos.x, pos.y, ImGuiCond.Once);
         if (ImGui.begin(name)) {
-            populateInternal(input);
+            populateInternal(input, handler);
         }
         ImGui.end();
     }

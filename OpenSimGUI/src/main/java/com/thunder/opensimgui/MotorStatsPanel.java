@@ -14,7 +14,7 @@ public class MotorStatsPanel extends PanelBase {
 
     @Override
     @SuppressWarnings("DefaultLocale")
-    public void populateInternal(SimulationInput input) {
+    public void populateInternal(SimulationInput input, SimulationLogicHandler handler) {
 
         if (ImGui.collapsingHeader("Motors")) {
             int motorCount = 0;

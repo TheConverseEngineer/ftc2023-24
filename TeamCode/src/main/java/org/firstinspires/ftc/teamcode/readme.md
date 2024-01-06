@@ -1,3 +1,10 @@
+## Overview
+The teamcode folder consists of the following files/packages: 
+ * trajectory -- contains the code required to create and follow drivetrain trajectories
+ * extensions -- contains a set of extension classes that supplement the FTCLib library
+ * DrivetrainConstants.java -- class that contains the config settings used by the trajectory package.
+ * SimulationEntryPoint.java -- used to control the simulator
+ 
 ## Conventions
 Here are some simple (but very important!) Java conventions to help keep code straightforward.
 
