@@ -203,10 +203,11 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         double rw = gamepad.right_stick_x;
 
         double speedTrigger = gamepad.right_trigger;
+        double brakeTrigger = gamepad.left_trigger;
 
         double theta = Math.atan2(y, x*1.1) - Math.PI/4 - odometry.getPoseEstimate().getHeading();
         double rho = (x*x + y*y)*(0.6 + 0.4*speedTrigger)/(Math.max(Math.abs(Math.cos(theta)), Math.abs(Math.sin(theta))))*(1-brakeTrigger*0.5);
-        double w = rw*(0.4+0.6*speedTrigger)*(1-gamepad.left_trigger*0.5);
+        double w = rw*(0.4+0.6*speedTrigger)*(1-brakeTrigger*0.5);
         if (rho+Math.abs(rw) > 1) {
             w = rw/(rho + Math.abs(rw));
             rho /= (rho + Math.abs(rw));
