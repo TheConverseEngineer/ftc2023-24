@@ -8,222 +8,117 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.common.utils.MathUtils;
 
 /** An alternative to {@link VirtualDcMotorEx} that relies on a simulation engine to receive data. */
 public class VirtualDummyMotorEx implements DcMotorEx {
 
-    @Override
-    public void setMotorEnable() {
+    private Direction direction = Direction.FORWARD;
+    private double currentPower = 0;
+    private double currentVelocity = 0;
+    private double currentPosition = 0;
 
-    }
-
-    @Override
-    public void setMotorDisable() {
-
-    }
-
-    @Override
-    public boolean isMotorEnabled() {
-        return false;
-    }
-
-    @Override
-    public void setVelocity(double angularRate) {
-
-    }
-
-    @Override
-    public void setVelocity(double angularRate, AngleUnit unit) {
-
-    }
-
-    @Override
-    public double getVelocity() {
-        return 0;
-    }
-
-    @Override
-    public double getVelocity(AngleUnit unit) {
-        return 0;
-    }
-
-    @Override
-    public void setPIDCoefficients(RunMode mode, PIDCoefficients pidCoefficients) {
-
-    }
-
-    @Override
-    public void setPIDFCoefficients(RunMode mode, PIDFCoefficients pidfCoefficients) throws UnsupportedOperationException {
-
-    }
-
-    @Override
-    public void setVelocityPIDFCoefficients(double p, double i, double d, double f) {
-
-    }
-
-    @Override
-    public void setPositionPIDFCoefficients(double p) {
-
-    }
-
-    @Override
-    public PIDCoefficients getPIDCoefficients(RunMode mode) {
-        return null;
-    }
-
-    @Override
-    public PIDFCoefficients getPIDFCoefficients(RunMode mode) {
-        return null;
-    }
-
-    @Override
-    public void setTargetPositionTolerance(int tolerance) {
-
-    }
-
-    @Override
-    public int getTargetPositionTolerance() {
-        return 0;
-    }
-
-    @Override
-    public double getCurrent(CurrentUnit unit) {
-        return 0;
-    }
-
-    @Override
-    public double getCurrentAlert(CurrentUnit unit) {
-        return 0;
-    }
-
-    @Override
-    public void setCurrentAlert(double current, CurrentUnit unit) {
-
-    }
-
-    @Override
-    public boolean isOverCurrent() {
-        return false;
-    }
-
-    @Override
-    public MotorConfigurationType getMotorType() {
-        return null;
-    }
-
-    @Override
-    public void setMotorType(MotorConfigurationType motorType) {
-
-    }
-
-    @Override
-    public DcMotorController getController() {
-        return null;
-    }
-
-    @Override
-    public int getPortNumber() {
-        return 0;
-    }
-
-    @Override
-    public void setZeroPowerBehavior(ZeroPowerBehavior zeroPowerBehavior) {
-
-    }
-
-    @Override
-    public ZeroPowerBehavior getZeroPowerBehavior() {
-        return null;
-    }
-
-    @Override
-    public void setPowerFloat() {
-
-    }
-
-    @Override
-    public boolean getPowerFloat() {
-        return false;
-    }
-
-    @Override
-    public void setTargetPosition(int position) {
-
-    }
-
-    @Override
-    public int getTargetPosition() {
-        return 0;
-    }
-
-    @Override
-    public boolean isBusy() {
-        return false;
-    }
 
     @Override
     public int getCurrentPosition() {
-        return 0;
-    }
-
-    @Override
-    public void setMode(RunMode mode) {
-
-    }
-
-    @Override
-    public RunMode getMode() {
-        return null;
+        return (int) Math.round(this.currentPosition);
     }
 
     @Override
     public void setDirection(Direction direction) {
-
+        this.direction = direction;
     }
 
     @Override
     public Direction getDirection() {
-        return null;
+        return this.direction;
     }
 
     @Override
     public void setPower(double power) {
-
+        this.currentPower = MathUtils.clamp(power, -1, 1);
     }
 
     @Override
     public double getPower() {
-        return 0;
+        return this.currentPower;
+    }
+
+
+    @Override
+    public void setMode(RunMode mode) {
+        if (mode == RunMode.STOP_AND_RESET_ENCODER) currentPosition = 0;
+        else if (mode != RunMode.RUN_WITHOUT_ENCODER) unsupported();
     }
 
     @Override
-    public Manufacturer getManufacturer() {
-        return null;
+    public RunMode getMode() {
+        return RunMode.RUN_WITHOUT_ENCODER;
+    }
+
+    public void internalSetPosition(double newPosition) {
+        this.currentPosition = newPosition;
+    }
+
+    public double internalGetExactPosition() {
+        return this.currentPosition;
+    }
+
+    public void internalSetVelocity(double currentVelocity) {
+        this.currentVelocity = currentVelocity;
     }
 
     @Override
-    public String getDeviceName() {
-        return null;
+    public double getVelocity() {
+        return currentVelocity;
     }
 
-    @Override
-    public String getConnectionInfo() {
-        return null;
+    private void unsupported() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Operation not supported by VirtualDummyMotorEx");
     }
 
-    @Override
-    public int getVersion() {
-        return 0;
-    }
+    @Override public void setMotorEnable() { unsupported(); }
+    @Override public void setMotorDisable() { unsupported(); }
+    @Override public boolean isMotorEnabled() { unsupported(); return false; }
 
-    @Override
-    public void resetDeviceConfigurationForOpMode() {
+    @Override public void setVelocity(double angularRate) { unsupported(); }
+    @Override public void setVelocity(double angularRate, AngleUnit unit) { unsupported(); }
+    @Override public double getVelocity(AngleUnit unit) { unsupported(); return 0; }
 
-    }
+    @Override public void setPIDCoefficients(RunMode mode, PIDCoefficients pidCoefficients) { unsupported(); }
+    @Override public void setPIDFCoefficients(RunMode mode, PIDFCoefficients pidfCoefficients) { unsupported(); }
+    @Override public void setVelocityPIDFCoefficients(double p, double i, double d, double f) { unsupported(); }
+    @Override public void setPositionPIDFCoefficients(double p) { unsupported(); }
+    @Override public PIDCoefficients getPIDCoefficients(RunMode mode) { unsupported(); return null; }
+    @Override public PIDFCoefficients getPIDFCoefficients(RunMode mode) { unsupported(); return null; }
 
-    @Override
-    public void close() {
+    @Override public void setTargetPositionTolerance(int tolerance) { unsupported(); }
+    @Override public int getTargetPositionTolerance() { unsupported(); return 0; }
 
-    }
+    @Override public double getCurrent(CurrentUnit unit) { unsupported(); return 0; }
+    @Override public double getCurrentAlert(CurrentUnit unit) { unsupported(); return 0; }
+    @Override public void setCurrentAlert(double current, CurrentUnit unit) { unsupported(); }
+    @Override public boolean isOverCurrent() { unsupported(); return false; }
+
+    @Override public MotorConfigurationType getMotorType() { unsupported(); return null; }
+    @Override public void setMotorType(MotorConfigurationType motorType) { unsupported(); }
+    @Override public DcMotorController getController() { unsupported(); return null; }
+    @Override public int getPortNumber() { unsupported(); return 0; }
+
+    @Override public void setZeroPowerBehavior(ZeroPowerBehavior zeroPowerBehavior) { }
+    @Override public ZeroPowerBehavior getZeroPowerBehavior() { unsupported(); return null; }
+
+    @Override public void setPowerFloat() { unsupported(); }
+    @Override public boolean getPowerFloat() { unsupported(); return false; }
+
+    @Override public void setTargetPosition(int position) { unsupported(); }
+    @Override public int getTargetPosition() { unsupported(); return 0; }
+    @Override public boolean isBusy() { unsupported(); return false; }
+
+    @Override public Manufacturer getManufacturer() { unsupported(); return null; }
+    @Override public String getDeviceName() { unsupported(); return null; }
+    @Override public String getConnectionInfo() { unsupported(); return null; }
+    @Override public int getVersion() { unsupported(); return 0; }
+    @Override public void resetDeviceConfigurationForOpMode() { unsupported(); }
+    @Override public void close() { }
 }

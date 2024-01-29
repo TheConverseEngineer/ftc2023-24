@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.common.command;
 
-
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,14 +13,12 @@ public final class CommandScheduler {
     private final Stack<Command> queuedCommands = new Stack<>();
     private final List<Command> runningCommands = new ArrayList<>();
     private final List<Subsystem> subsystems = new ArrayList<>();
-    boolean dashboardEnabled = false;
 
     /** Resets the command scheduler. It is recommended to run this before/after every opmode. */
     public void reset() {
         runningCommands.clear();
         queuedCommands.clear();
         subsystems.clear();
-        dashboardEnabled = false;
     }
 
     /** Schedules commands to run on the next loop iteration */
@@ -55,11 +49,6 @@ public final class CommandScheduler {
 
         for (Subsystem subsystem : subsystems) subsystem.periodic();
 
-        if (this.dashboardEnabled) {
-            TelemetryPacket packet = new TelemetryPacket();
-            for (Subsystem subsystem: subsystems) subsystem.simPeriodic(packet);
-            FtcDashboard.getInstance().sendTelemetryPacket(packet);
-        }
     }
 
     public static CommandScheduler getInstance() {
