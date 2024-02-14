@@ -26,6 +26,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.common.command.Command;
 import org.firstinspires.ftc.teamcode.common.command.Subsystem;
 import org.firstinspires.ftc.teamcode.common.command.gamepad.GamepadEx;
+import org.firstinspires.ftc.teamcode.common.utils.DashboardManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +34,10 @@ import java.util.List;
 @Config
 public class DriveSubsystem extends MecanumDrive implements Subsystem {
 
-    public static double ODO_IN_PER_TICK = 0.001056876526771654;
-    public static double ODO_TRACK_WIDTH = 10;
-    public static double ODO_FRONT_OFFSET = 5;
+    // .00104963, .00106459, .00105193   vs    0.00114746364 (theoretical--wrong dia)
+    public static double[] ODO_IN_PER_TICK = {-0.00105691, 0.00105691, 0.00105691};
+    public static double ODO_TRACK_WIDTH = 10.1636;
+    public static double ODO_FRONT_OFFSET = 9;
 
     // Please note that these values are for the drivetrain, not for odo and should probably not be edited
     public static final double DRIVETRAIN_TRACK_WIDTH = 5.244095*2;
@@ -47,14 +49,14 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, DRIVETRAIN_TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
 
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients();
-    public static PIDCoefficients ROTATIONAL_PID = new PIDCoefficients();
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0);
+    public static PIDCoefficients ROTATIONAL_PID = new PIDCoefficients(5, 0, 0);
 
-    public static double kV, kA, kStatic;
+    public static double kV = .015, kA = .002, kStatic = .07;
 
     private final TrajectoryFollower follower;
 
-    private final DcMotorEx leftFront, leftRear, rightFront, rightRear;
+    public final DcMotorEx leftFront, leftRear, rightFront, rightRear;
 
     private final VoltageSensor voltageSensor;
 
@@ -84,7 +86,7 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         // Set up odo
-        odometry = new OdometrySubsystem(leftFront, rightRear, leftRear);
+        odometry = new OdometrySubsystem(leftFront, leftRear, rightFront);
     }
 
     @Override
@@ -116,15 +118,16 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
 
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftRear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
     @Override
@@ -189,6 +192,14 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
 
         // Now apply the drive signal
         setDriveSignal(driveSignal);
+
+        // Draw robot desired pose
+        Pose2d realPose = odometry.getPoseEstimate();
+        Pose2d desired = realPose.plus(follower.getLastError());
+        DashboardManager.getInstance().drawRobot(realPose);
+        DashboardManager.getInstance().drawRobot(desired);
+        DashboardManager.getInstance().put("y", follower.getLastError().getY());
+        DashboardManager.getInstance().put("x", follower.getLastError().getX());
     }
 
     /** Call this method every loop iteration in order to drive during teleop
@@ -205,7 +216,7 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         double speedTrigger = gamepad.right_trigger;
         double brakeTrigger = gamepad.left_trigger;
 
-        double theta = Math.atan2(y, x*1.1) - Math.PI/4 - odometry.getPoseEstimate().getHeading();
+        double theta = Math.atan2(y, x*1.1) - Math.PI/4  - odometry.getPoseEstimate().getHeading();
         double rho = (x*x + y*y)*(0.6 + 0.4*speedTrigger)/(Math.max(Math.abs(Math.cos(theta)), Math.abs(Math.sin(theta))))*(1-brakeTrigger*0.5);
         double w = rw*(0.4+0.6*speedTrigger)*(1-brakeTrigger*0.5);
         if (rho+Math.abs(rw) > 1) {

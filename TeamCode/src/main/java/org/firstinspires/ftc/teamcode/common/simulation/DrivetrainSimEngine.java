@@ -59,12 +59,12 @@ public class DrivetrainSimEngine {
         double rightDelta = 0.5*(2*localDelta.get(0, 0) + DriveSubsystem.ODO_TRACK_WIDTH*localDelta.get(2, 0));
         double forwardDelta = DriveSubsystem.ODO_FRONT_OFFSET*localDelta.get(2, 0) + localDelta.get(1, 0);
 
-        leftFront.internalSetPosition(leftFront.internalGetExactPosition() + leftDelta/ DriveSubsystem.ODO_IN_PER_TICK);
-        rightRear.internalSetPosition(rightRear.internalGetExactPosition() + rightDelta/ DriveSubsystem.ODO_IN_PER_TICK);
-        leftRear.internalSetPosition(leftRear.internalGetExactPosition() + forwardDelta/ DriveSubsystem.ODO_IN_PER_TICK);
+        leftFront.internalSetPosition(leftFront.internalGetExactPosition() + leftDelta/ DriveSubsystem.ODO_IN_PER_TICK[0]);
+        rightRear.internalSetPosition(rightRear.internalGetExactPosition() + rightDelta/ DriveSubsystem.ODO_IN_PER_TICK[1]);
+        leftRear.internalSetPosition(leftRear.internalGetExactPosition() + forwardDelta/ DriveSubsystem.ODO_IN_PER_TICK[2]);
 
-        leftFront.internalSetVelocity(leftDelta/(DriveSubsystem.ODO_IN_PER_TICK*deltaTime));
-        rightRear.internalSetVelocity(rightDelta/(DriveSubsystem.ODO_IN_PER_TICK*deltaTime));
-        leftRear.internalSetVelocity(forwardDelta/(DriveSubsystem.ODO_IN_PER_TICK*deltaTime));
+        leftFront.internalSetVelocity(leftDelta/(DriveSubsystem.ODO_IN_PER_TICK[0]*deltaTime));
+        rightRear.internalSetVelocity(rightDelta/(DriveSubsystem.ODO_IN_PER_TICK[1]*deltaTime));
+        leftRear.internalSetVelocity(forwardDelta/(DriveSubsystem.ODO_IN_PER_TICK[2]*deltaTime));
     }
 }

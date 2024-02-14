@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.common.trajectory;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.common.utils.MathUtils;
@@ -26,24 +27,29 @@ public class OdometrySubsystem {
         robotPose.set(new Pose2d());
     }
 
+    public String getEncoderRaw() {
+        return String.format("%6.1f %6.1f %6.1f", encoderValues[0], encoderValues[1], encoderValues[2]);
+    }
+
     /** Updates the pose estimate from the tracking wheels
      * <br>
      * This method should ideally be called as often as possible (once per loop iteration)
      * */
     public void updateTrackingWheels() {
-        double[] encoderDeltaInches = new double[3];
+        double[] encoderDeltaInches = new double[3]; // left, right, front
 
         for (int i = 0; i < 3; i++) {
             encoderDeltaInches[i] = pods[i].getCurrentPosition()-encoderValues[i];
             encoderValues[i] += encoderDeltaInches[i];
-            encoderDeltaInches[i] *= DriveSubsystem.ODO_IN_PER_TICK;
+            encoderDeltaInches[i] *= DriveSubsystem.ODO_IN_PER_TICK[i];
         }
 
         double dTheta = (encoderDeltaInches[1] - encoderDeltaInches[0])/ DriveSubsystem.ODO_TRACK_WIDTH;
+
         integrateDeltaPose(
-                (encoderDeltaInches[0] + encoderDeltaInches[1])/2,
-                encoderDeltaInches[2] - dTheta* DriveSubsystem.ODO_FRONT_OFFSET,
-                dTheta
+               (encoderDeltaInches[0] + encoderDeltaInches[1])/2,
+               encoderDeltaInches[2] - dTheta*DriveSubsystem.ODO_FRONT_OFFSET,
+               dTheta
         );
     }
 

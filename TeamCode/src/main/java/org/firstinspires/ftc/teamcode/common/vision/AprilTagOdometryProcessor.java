@@ -23,6 +23,7 @@ public class AprilTagOdometryProcessor extends AprilTagProcessorImpl {
     private final OdometrySubsystem odometry;
 
     public static double covarianceGain = 0.2;
+    public static double offset = 11;
 
     public AprilTagOdometryProcessor(OdometrySubsystem odometry, double fx, double fy, double cx, double cy, DistanceUnit outputUnitsLength, AngleUnit outputUnitsAngle, AprilTagLibrary tagLibrary, boolean drawAxes, boolean drawCube, boolean drawOutline, boolean drawTagID, TagFamily tagFamily, int threads) {
         super(fx, fy, cx, cy, outputUnitsLength, outputUnitsAngle, tagLibrary, drawAxes, drawCube, drawOutline, drawTagID, tagFamily, threads);
@@ -51,12 +52,14 @@ public class AprilTagOdometryProcessor extends AprilTagProcessorImpl {
             Vector2d robotOffset = new Vector2d(i.ftcPose.y, i.ftcPose.x).rotated(i.ftcPose.yaw);
 
             Vector2d visionPoseEstimate = tagPosition.plus(new Vector2d(robotOffset.getX(), -robotOffset.getY()));
+            visionPoseEstimate = visionPoseEstimate.plus(currentPoseEstimate.headingVec().times(offset));
 
             synchronized (cumulativeHeadingMutex) {
                 cumulativeHeadingError += Math.abs(currentPoseEstimate.getHeading() - i.ftcPose.yaw);
             }
 
-            Pose2d deltaPose = new Pose2d(visionPoseEstimate.minus(currentPoseEstimate.vec()).times(covarianceGain), currentPoseEstimate.getHeading());
+            // TODO: only correct distance from back wall.
+            Pose2d deltaPose = new Pose2d(visionPoseEstimate.minus(currentPoseEstimate.vec()), 0).times(covarianceGain);
 
             odometry.addDeltaPose(deltaPose);
             currentPoseEstimate = currentPoseEstimate.plus(deltaPose);
@@ -86,7 +89,9 @@ public class AprilTagOdometryProcessor extends AprilTagProcessorImpl {
                 TagFamily.TAG_36h11, 3
         );
 
-        instance.setPoseSolver(PoseSolver.OPENCV_ITERATIVE);
+        // This is theoretically the best algorithm, but we should probably make sure that it
+        // is fast and has good precision.
+        instance.setPoseSolver(PoseSolver.OPENCV_IPPE_SQUARE);
 
         return instance;
     }

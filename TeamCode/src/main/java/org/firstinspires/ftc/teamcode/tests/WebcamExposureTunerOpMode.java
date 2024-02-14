@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.tests;
 
 /* Copyright (c) 2023 FIRST. All rights reserved.
  *

@@ -18,6 +18,8 @@ public class ProfiledSystemController {
 
     private final ProfileConstants constants;
 
+    public double lastTargetVelocity = 0;
+
     /** Creates a new ProfiledSystemController object
      * <br>
      * This class is similar to a PID controller, but smoothly interpolates between targets
@@ -37,8 +39,8 @@ public class ProfiledSystemController {
 
     /** Sets the current target of the controller. */
     public void setNewTarget(double newPos) {
+        State current = this.calculate(timer.seconds() - resetTime);
         resetTime = timer.seconds();
-        State current = this.calculate(resetTime);
         this.setNewTarget(newPos, current.position, current.velocity);
     }
 
@@ -49,6 +51,7 @@ public class ProfiledSystemController {
      * */
     public double getMotorPower(double currentPosition) {
         State target = this.calculate(timer.seconds() - resetTime);
+        this.lastTargetVelocity = target.velocity;
         return  constants.kV * target.velocity +
                 constants.kP * (target.position - currentPosition);
     }
@@ -126,6 +129,13 @@ public class ProfiledSystemController {
         return direct(result);
     }
 
+    public double getTargetPosition() {
+        return calculate(timer.time() - resetTime).position;
+    }
+
+    public double getTargetVelocity() {
+        return calculate(timer.time() - resetTime).velocity;
+    }
 
     public static class ProfileConstants {
         public double MAX_ACCEL, MAX_VEL, kV, kP;

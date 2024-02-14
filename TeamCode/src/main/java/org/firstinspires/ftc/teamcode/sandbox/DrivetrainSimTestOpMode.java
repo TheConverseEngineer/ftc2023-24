@@ -46,7 +46,7 @@ public class DrivetrainSimTestOpMode extends CommandOpMode {
 
     @Override
     public void run() {
-        heading = AngleUnit.normalizeRadians((leftFront.getCurrentPosition() - rightBack.getCurrentPosition())* DriveSubsystem.ODO_IN_PER_TICK / DriveSubsystem.ODO_TRACK_WIDTH);
+        heading = AngleUnit.normalizeRadians((leftFront.getCurrentPosition() - rightBack.getCurrentPosition())* DriveSubsystem.ODO_IN_PER_TICK[2] / DriveSubsystem.ODO_TRACK_WIDTH);
 
         telemetry.addData("head", heading);
 
