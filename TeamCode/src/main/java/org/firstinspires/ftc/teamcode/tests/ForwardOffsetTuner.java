@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.tests;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.teamcode.common.trajectory.DriveSubsystem;
 
 @TeleOp
+@Disabled
 public class ForwardOffsetTuner extends LinearOpMode {
     private DcMotor leftFront, leftRear, rightFront, rightRear, rightEncoder;
     private final double[] encoderValues = {0, 0, 0};

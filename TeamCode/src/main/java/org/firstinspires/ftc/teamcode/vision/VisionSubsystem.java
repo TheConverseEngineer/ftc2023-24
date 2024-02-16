@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import android.util.Size;
 
+import androidx.annotation.NonNull;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -20,7 +22,7 @@ public class VisionSubsystem implements Subsystem {
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(detectionPipeline)
-                .setCameraResolution(new Size(640, 480))
+                .setCameraResolution(new Size(1280, 720))
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)
@@ -48,5 +50,11 @@ public class VisionSubsystem implements Subsystem {
     @Override
     public void periodic() {
 
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return detectionPipeline.toString();
     }
 }

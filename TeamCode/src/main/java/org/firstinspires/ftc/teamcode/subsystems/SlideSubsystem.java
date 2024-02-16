@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -23,12 +25,14 @@ public class SlideSubsystem implements Subsystem {
     public static double SLIDE_MIN_POS = -0.2, SLIDE_MAX_POS = 22.5;
     public static double ARM_MIN_POS = -0.1, ARM_MAX_POS = 2.08;
 
-    public static double armkF = 0.15;
+    public static double armkF = 0.15, armkPV = 0;
 
     private final DcMotorEx slideMotor1, slideMotor2, armMotor;
 
     public double armPosition = 0, slidePosition = 0;
     private double lastArmTarget = 0, lastSlideTarget = 0;
+
+    private boolean armkFEnabled = true;
 
     public SlideSubsystem(HardwareMap hardwareMap) {
         slideController = new ProfiledSystemController(0, slideConstants);
@@ -45,6 +49,10 @@ public class SlideSubsystem implements Subsystem {
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         slideMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        armMotor.setZeroPowerBehavior(BRAKE);
+        slideMotor1.setZeroPowerBehavior(BRAKE);
+        slideMotor2.setZeroPowerBehavior(BRAKE);
+
     }
 
     @Override
@@ -60,11 +68,20 @@ public class SlideSubsystem implements Subsystem {
         } else if (armPosition > ARM_MAX_POS) {
             armMotor.setPower(-0.25);
         } else {
-            double power = armController.getMotorPower(armPosition) + armkF*Math.cos(armPosition);
+            double power = armController.getMotorPower(armPosition) + (armkFEnabled?(armkF*Math.cos(armPosition)):0) +
+                    armkPV*(armController.lastTargetVelocity - (armMotor.getVelocity()/ARM_TICKS_PER_RAD));
             armMotor.setPower(power);
             DashboardManager.getInstance().put("arm vel", armMotor.getVelocity()/ARM_TICKS_PER_RAD);
             DashboardManager.getInstance().put("target vel", armController.lastTargetVelocity);
         }
+    }
+
+    public void enableArmKf() {
+        armkFEnabled = true;
+    }
+
+    public void disableArmKf() {
+        armkFEnabled = false;
     }
 
     private void slidePeriodic() {

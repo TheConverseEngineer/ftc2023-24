@@ -13,13 +13,13 @@ public class TeamElementDetectionTest extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        visionSubsystem = new VisionSubsystem(hardwareMap, TeamElementDetectionPipeline.Alliance.BLUE);
-
+        visionSubsystem = new VisionSubsystem(hardwareMap, TeamElementDetectionPipeline.Alliance.RED);
+        visionSubsystem.enableTeamDetection();
         waitForStart();
 
         while (opModeIsActive() && !isStopRequested()) {
             telemetry.addData("frames", visionSubsystem.getFramesAnalyzed());
-            telemetry.addData("result", visionSubsystem.getTeamElementLocation().name());
+            telemetry.addData("result", visionSubsystem.toString());
             telemetry.update();
         }
     }

@@ -4,6 +4,10 @@ package org.firstinspires.ftc.teamcode.vision;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.core.Core;
@@ -14,11 +18,12 @@ import org.opencv.imgproc.Imgproc;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Config
 public class TeamElementDetectionPipeline implements VisionProcessor {
 
-    public static int[] leftCoords = new int[]{280, 50, 300, 70};
-    public static int[] rightCoords = new int[]{10, 10, 20, 20};
-    public static int[] centerCoords = new int[]{10, 10, 20, 20};
+    public static int[] rightCoords = new int[]{1130, 80, 1270, 220};
+    public static int[] leftCoords = new int[]{180, 50, 300, 180};
+    public static int[] centerCoords = new int[]{670, 55, 760, 150};
 
 
 
@@ -75,11 +80,11 @@ public class TeamElementDetectionPipeline implements VisionProcessor {
             if (this.currentAlliance == Alliance.BLUE) {
                 // Minimum value of channel index 2
                 if (leftAverage.val[2] < rightAverage.val[2] && leftAverage.val[2] < centerAverage.val[2]) detectionCounters[0]++;
-                if (leftAverage.val[2] > rightAverage.val[2] && rightAverage.val[2] < centerAverage.val[2]) detectionCounters[2]++;
+                else if (leftAverage.val[2] > rightAverage.val[2] && rightAverage.val[2] < centerAverage.val[2]) detectionCounters[2]++;
                 else detectionCounters[1]++;
             } else {
                 if (leftAverage.val[1] > rightAverage.val[1] && leftAverage.val[1] > centerAverage.val[1]) detectionCounters[0]++;
-                if (leftAverage.val[1] < rightAverage.val[1] && rightAverage.val[1] > centerAverage.val[1]) detectionCounters[2]++;
+                else if (leftAverage.val[1] < rightAverage.val[1] && rightAverage.val[1] > centerAverage.val[1]) detectionCounters[2]++;
                 else detectionCounters[1]++;
             }
         }
@@ -121,5 +126,13 @@ public class TeamElementDetectionPipeline implements VisionProcessor {
         canvas.drawRect(leftCoords[0]*scaleBmpPxToCanvasPx, leftCoords[1]*scaleBmpPxToCanvasPx, leftCoords[2]*scaleBmpPxToCanvasPx, leftCoords[3]*scaleBmpPxToCanvasPx, paint);
         canvas.drawRect(centerCoords[0]*scaleBmpPxToCanvasPx, centerCoords[1]*scaleBmpPxToCanvasPx, centerCoords[2]*scaleBmpPxToCanvasPx, centerCoords[3]*scaleBmpPxToCanvasPx, paint);
         canvas.drawRect(rightCoords[0]*scaleBmpPxToCanvasPx, rightCoords[1]*scaleBmpPxToCanvasPx, rightCoords[2]*scaleBmpPxToCanvasPx, rightCoords[3]*scaleBmpPxToCanvasPx, paint);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        synchronized (detectionAccessLock) {
+            return String.format("%d %d %d", detectionCounters[0], detectionCounters[1], detectionCounters[2]);
+        }
     }
 }

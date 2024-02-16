@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import android.util.Size;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -16,6 +17,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 
 
 @TeleOp
+@Disabled
 public class FullOdoTest extends CommandOpMode {
 
     VisionPortal visionPortal;

@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
-import org.firstinspires.ftc.teamcode.common.command.gamepad.GamepadEx;
 import org.firstinspires.ftc.teamcode.common.trajectory.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.common.utils.MathUtils;
 import org.firstinspires.ftc.teamcode.subsystems.GripperSubsystem;
@@ -33,7 +32,7 @@ public class StandardTeleOp extends CommandOpMode {
         drive = new DriveSubsystem(hardwareMap);
         wrist = new WristSubsystem(hardwareMap);
 
-        scheduler.registerSubsystem(slideSubsystem, gripper, drive);
+        scheduler.registerSubsystem(slideSubsystem, gripper, drive, wrist);
 
         codriver.add("raise", codriver.new TriangleToggleButton() {
             @Override
@@ -134,13 +133,16 @@ public class StandardTeleOp extends CommandOpMode {
         // FSM which controls the slides and arms
         switch (currentSlideState) {
             case LOWERED:
+                slideSubsystem.disableArmKf();
                 break;
             case RAISED:
+                slideSubsystem.disableArmKf();
                 if (Math.abs(slideSubsystem.getLastSlideTarget() - currentStackTarget) > 0.01) {
                     slideSubsystem.setSlideTarget(currentStackTarget);
                 }
                 break;
             case LOWERING:
+                slideSubsystem.enableArmKf();
                 if (Math.abs(slideSubsystem.getLastSlideTarget()) > 0.01)
                     // Move slide first
                     slideSubsystem.setSlideTarget(0);
@@ -153,6 +155,7 @@ public class StandardTeleOp extends CommandOpMode {
                 }
                 break;
             case RAISING:
+                slideSubsystem.enableArmKf();
                 if (Math.abs(slideSubsystem.getLastSlideTarget()) > 0.01)
                     // Move slide first
                     slideSubsystem.setSlideTarget(0);
@@ -169,8 +172,11 @@ public class StandardTeleOp extends CommandOpMode {
         }
 
         if (currentSlideState == SlideState.LOWERED && gamepad1.right_bumper) {
-            wrist.goToIntakePosition();
-        } else wrist.goToOuttakePosition();
+            wrist.intakePosition();
+        } else if(currentSlideState == SlideState.LOWERING) {
+            wrist.transferPosition();
+        } else wrist.outtakePosition();
+
 
         telemetry.addData("state", currentSlideState.name());
         telemetry.addData("height", currentStackTarget);

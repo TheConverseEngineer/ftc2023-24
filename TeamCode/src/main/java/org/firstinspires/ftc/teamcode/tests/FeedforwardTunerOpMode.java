@@ -16,6 +16,7 @@ import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
 import com.acmerobotics.roadrunner.util.NanoClock;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -26,7 +27,7 @@ import org.firstinspires.ftc.teamcode.common.utils.Encoder;
 
 import java.util.Objects;
 
-@Config
+@Disabled
 @TeleOp
 public class FeedforwardTunerOpMode extends LinearOpMode {
     public static double DISTANCE = 60; // in

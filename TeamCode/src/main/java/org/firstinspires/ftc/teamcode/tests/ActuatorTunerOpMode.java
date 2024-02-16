@@ -43,6 +43,5 @@ public class ActuatorTunerOpMode extends CommandOpMode {
         DashboardManager.getInstance().put("arm tar", actuator.armController.getTargetPosition());
         DashboardManager.getInstance().put("slide tar", actuator.slideController.getTargetPosition());
 
-
     }
 }

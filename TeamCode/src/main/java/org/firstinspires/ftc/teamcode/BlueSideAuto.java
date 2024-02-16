@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.common.trajectory.Knot;
 import java.util.Scanner;
 
 
-@Autonomous
+@Autonomous(preselectTeleOp = "StandardTeleOp")
 @Config
 public class BlueSideAuto extends CommandOpMode {
 

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.common.command.Command;
@@ -12,6 +13,7 @@ import org.firstinspires.ftc.teamcode.common.trajectory.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.common.trajectory.Knot;
 
 @TeleOp
+@Disabled
 public class FeedbackTunerOpMode extends CommandOpMode {
 
     DriveSubsystem driveSubsystem;

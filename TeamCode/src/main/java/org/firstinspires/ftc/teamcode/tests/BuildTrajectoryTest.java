@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.teamcode.common.trajectory.Knot;
 import org.firstinspires.ftc.teamcode.common.utils.DashboardManager;
 
 @TeleOp
-@Config
+@Disabled
 public class BuildTrajectoryTest extends CommandOpMode {
 
     private Trajectory trajectory1, trajectory2;

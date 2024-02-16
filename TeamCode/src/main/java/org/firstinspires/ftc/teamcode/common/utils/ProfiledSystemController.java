@@ -29,6 +29,7 @@ public class ProfiledSystemController {
         endAccelTime = -1;
         endFullSpeedTime = -1;
         endDeccelTime = -1;
+        directionMultiplier = 1;
         timer = new ElapsedTime();
         timer.reset();
         resetTime = 0;
