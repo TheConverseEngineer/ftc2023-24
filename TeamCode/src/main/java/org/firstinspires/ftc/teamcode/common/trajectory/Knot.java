@@ -18,6 +18,10 @@ public class Knot {
         this.splineHeading = Math.toRadians(splineHeading);
     }
 
+    public Knot(Pose2d pose, double splineHeading) {
+        this(pose.getX(), pose.getY(), Math.toDegrees(pose.getHeading()), splineHeading);
+    }
+
     public Knot() {
         this(0.0, 0.0, 0.0, 0.0);
     }

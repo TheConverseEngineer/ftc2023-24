@@ -44,7 +44,7 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
     public static final double DRIVETRAIN_WHEEL_BASE = 6.435*2;
     public static final double LATERAL_MULTIPLIER = 1.11;
 
-    public static final double MAX_VEL = 40, MAX_ACCEL = 40, MAX_ANG_VEL = Math.PI, MAX_ANG_ACCEL = Math.PI;
+    public static final double MAX_VEL = 30, MAX_ACCEL = 30, MAX_ANG_VEL = Math.PI, MAX_ANG_ACCEL = Math.PI;
 
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, DRIVETRAIN_TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);

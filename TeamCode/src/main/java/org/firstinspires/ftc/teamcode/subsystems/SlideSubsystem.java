@@ -22,7 +22,7 @@ public class SlideSubsystem implements Subsystem {
             = new ProfiledSystemController.ProfileConstants(4.5, 3, .22, 3);
     public static double SLIDE_TICKS_PER_INCH = 1/0.01838383217;
     public static double ARM_TICKS_PER_RAD = 428.365529;
-    public static double SLIDE_MIN_POS = -0.2, SLIDE_MAX_POS = 22.5;
+    public static double SLIDE_MIN_POS = -0.2, SLIDE_MAX_POS = 23.5;
     public static double ARM_MIN_POS = -0.1, ARM_MAX_POS = 2.08;
 
     public static double armkF = 0.15, armkPV = 0;

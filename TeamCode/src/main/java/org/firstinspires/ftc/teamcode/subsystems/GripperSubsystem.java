@@ -12,7 +12,7 @@ public class GripperSubsystem implements Subsystem {
 
     /* open and close ranges */
     public static double RIGHT_SERVO_CLOSE = .45;
-    public static double LEFT_SERVO_CLOSE = .68;
+    public static double LEFT_SERVO_CLOSE = .69;
     public static double RIGHT_SERVO_OPEN = .78;
     public static double LEFT_SERVO_OPEN = .30;
 

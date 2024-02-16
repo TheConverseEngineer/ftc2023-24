@@ -29,6 +29,20 @@ public class WristSubsystem implements Subsystem {
         upperWrist.setPosition(UPPER_WRIST_INTAKE);
     }
 
+    public void spikeDropPosition() {
+        upperWrist.setPosition(.26);
+        lowerWrist.setPosition(.41);
+    }
+
+    public void stackTopIntakePos() {
+        upperWrist.setPosition(0.28);
+        lowerWrist.setPosition(0.43);
+    }
+
+    public void stackBottomIntakePos() {
+        upperWrist.setPosition(0.25);
+        lowerWrist.setPosition(0.40);
+    }
 
     public void outtakePosition() {
         lowerWrist.setPosition(LOWER_WRIST_OUTTAKE);
@@ -38,6 +52,11 @@ public class WristSubsystem implements Subsystem {
     public void transferPosition() {
         upperWrist.setPosition(UPPER_WRIST_OUTTAKE);
         lowerWrist.setPosition(0.3);
+    }
+
+    public void visionOuttakePosition() {
+        upperWrist.setPosition(.65);
+        lowerWrist.setPosition(.31);
     }
 
     @Override
