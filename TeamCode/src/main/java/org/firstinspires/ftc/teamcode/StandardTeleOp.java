@@ -76,11 +76,11 @@ public class StandardTeleOp extends CommandOpMode {
             @Override
             public void onPress(boolean value) {
                 if (gamepad2.a) {
-                    WristSubsystem.LOWER_WRIST_INTAKE -= 0.01;
-                    if (WristSubsystem.LOWER_WRIST_INTAKE < 0) WristSubsystem.LOWER_WRIST_INTAKE = 0;
+                    wrist.LOWER_WRIST_INTAKE -= 0.01;
+                    if (wrist.LOWER_WRIST_INTAKE < 0) wrist.LOWER_WRIST_INTAKE = 0;
                 } else if (gamepad2.x) {
-                    WristSubsystem.LOWER_WRIST_OUTTAKE -= 0.01;
-                    if (WristSubsystem.LOWER_WRIST_OUTTAKE < 0) WristSubsystem.LOWER_WRIST_OUTTAKE = 0;
+                    wrist.LOWER_WRIST_OUTTAKE -= 0.01;
+                    if (wrist.LOWER_WRIST_OUTTAKE < 0) wrist.LOWER_WRIST_OUTTAKE = 0;
                 } else {
                     gripper.openLeftClaw();
                 }
@@ -91,11 +91,11 @@ public class StandardTeleOp extends CommandOpMode {
             @Override
             public void onPress(boolean value) {
                 if (gamepad2.a) {
-                    WristSubsystem.LOWER_WRIST_INTAKE += 0.01;
-                    if (WristSubsystem.LOWER_WRIST_INTAKE > 1) WristSubsystem.LOWER_WRIST_INTAKE = 1;
-                } else if (gamepad2.b) {
-                    WristSubsystem.LOWER_WRIST_OUTTAKE += 0.01;
-                    if (WristSubsystem.LOWER_WRIST_OUTTAKE > 1) WristSubsystem.LOWER_WRIST_OUTTAKE = 1;
+                    wrist.LOWER_WRIST_INTAKE += 0.01;
+                    if (wrist.LOWER_WRIST_INTAKE > 1) wrist.LOWER_WRIST_INTAKE = 1;
+                } else if (gamepad2.x) {
+                    wrist.LOWER_WRIST_OUTTAKE += 0.01;
+                    if (wrist.LOWER_WRIST_OUTTAKE > 1) wrist.LOWER_WRIST_OUTTAKE = 1;
                 } else {
                     gripper.openRightClaw();
                 }
@@ -175,11 +175,15 @@ public class StandardTeleOp extends CommandOpMode {
             wrist.intakePosition();
         } else if(currentSlideState == SlideState.LOWERING) {
             wrist.transferPosition();
-        } else wrist.outtakePosition();
+        } else if (currentSlideState == SlideState.RAISED) {
+            wrist.outtakePosition();
+        } else {
+            wrist.idlePosition();
+        }
 
 
         telemetry.addData("state", currentSlideState.name());
+        telemetry.addData("lower", wrist.LOWER_WRIST_INTAKE);
         telemetry.addData("height", currentStackTarget);
-        telemetry.addData("heading", drive.getOdometry().getPoseEstimate().getHeading());
     }
 }

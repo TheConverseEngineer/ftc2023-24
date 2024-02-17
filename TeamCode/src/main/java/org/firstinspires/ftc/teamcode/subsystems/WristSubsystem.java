@@ -9,11 +9,11 @@ import org.firstinspires.ftc.teamcode.common.utils.ProfiledServo;
 
 @Config
 public class WristSubsystem implements Subsystem {
-    public static double LOWER_WRIST_INTAKE = 0.365;
-    public static double LOWER_WRIST_OUTTAKE = 0.17;
+    public double LOWER_WRIST_INTAKE = 0.365;
+    public double LOWER_WRIST_OUTTAKE = 0.17;
 
-    public static double UPPER_WRIST_INTAKE = 0.225;
-    public static double UPPER_WRIST_OUTTAKE = 0.57;
+    public double UPPER_WRIST_INTAKE = 0.225;
+    public double UPPER_WRIST_OUTTAKE = 0.57;
 
     private ServoImplEx lowerWrist;
     private ProfiledServo upperWrist;
@@ -44,9 +44,14 @@ public class WristSubsystem implements Subsystem {
         lowerWrist.setPosition(0.40);
     }
 
-    public void outtakePosition() {
+    public void idlePosition() {
         lowerWrist.setPosition(LOWER_WRIST_OUTTAKE);
         upperWrist.setPosition(UPPER_WRIST_OUTTAKE);
+    }
+
+    public void outtakePosition() {
+        lowerWrist.setPosition(.20);
+        upperWrist.setPosition(.59);
     }
 
     public void transferPosition() {
