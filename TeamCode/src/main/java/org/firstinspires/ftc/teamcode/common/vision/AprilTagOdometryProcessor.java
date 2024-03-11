@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.common.trajectory.OdometrySubsystem;
@@ -11,79 +12,80 @@ import org.firstinspires.ftc.teamcode.common.utils.MathUtils;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 @Config
 public class AprilTagOdometryProcessor extends AprilTagProcessorImpl {
 
-    private final OdometrySubsystem odometry;
-
-    public static double covarianceGain = 0.2;
-    public static double offset = 11;
-
-    public AprilTagOdometryProcessor(OdometrySubsystem odometry, double fx, double fy, double cx, double cy, DistanceUnit outputUnitsLength, AngleUnit outputUnitsAngle, AprilTagLibrary tagLibrary, boolean drawAxes, boolean drawCube, boolean drawOutline, boolean drawTagID, TagFamily tagFamily, int threads) {
-        super(fx, fy, cx, cy, outputUnitsLength, outputUnitsAngle, tagLibrary, drawAxes, drawCube, drawOutline, drawTagID, tagFamily, threads);
-
-        this.odometry = odometry;
+    public AprilTagOdometryProcessor(Supplier<Pose2d> currentPose, Consumer<Vector2d> updateCallback, double fx, double fy, double cx, double cy, DistanceUnit outputUnitsLength, AngleUnit outputUnitsAngle, AprilTagLibrary tagLibrary, boolean drawAxes, boolean drawCube, boolean drawOutline, boolean drawTagID, TagFamily tagFamily, int threads) {
+        super(fx, fy, cx, cy, outputUnitsLength, outputUnitsAngle, tagLibrary, drawAxes, drawCube, drawOutline, drawTagID, tagFamily, threads, false);
+        this.currentPose = currentPose;
+        this.updateCallback = updateCallback;
     }
 
-    private final AtomicInteger detectedItems = new AtomicInteger(0);
-    private double cumulativeHeadingError = 0;
-    private final Object cumulativeHeadingMutex = new Object();
+    public static double CAMERA_ANGLE = 23.5;
+    public static double Y_OFFSET = 4.875;
+    public static double X_OFFSET = 5;
 
-    @SuppressWarnings("unchecked")
+    private final Supplier<Pose2d> currentPose;
+    private final Consumer<Vector2d> updateCallback;
+
+    private static final double K = 0.8;
+
     @Override
+    @SuppressWarnings("unchecked")
     public Object processFrame(Mat input, long captureTimeNanos) {
-        Pose2d currentPoseEstimate = odometry.getPoseEstimate(); // Do this before finding tags
+        Pose2d pose = currentPose.get();
 
         ArrayList<AprilTagDetection> detections =
                 (ArrayList<AprilTagDetection>) super.processFrame(input, captureTimeNanos);
 
-
         for (AprilTagDetection i : detections) {
-            if (i.metadata == null) continue; // Unknown tag
-            detectedItems.getAndIncrement();
+            if (i.metadata == null) continue; // Unknown tag (how did this even enter the camera view?)
+            Vector2d tagPosition = fromVectorF(i.metadata.fieldPosition);
+            Vector2d cameraPosition = tagPosition .plus (vectorOffset(i.ftcPose));
 
-            Vector2d tagPosition = MathUtils.toVector(i.metadata.fieldPosition);
-            Vector2d robotOffset = new Vector2d(i.ftcPose.y, i.ftcPose.x).rotated(i.ftcPose.yaw);
+            Vector2d robotPosition = cameraPosition .plus (new Vector2d(X_OFFSET, Y_OFFSET).rotated(-pose.getHeading()));
 
-            Vector2d visionPoseEstimate = tagPosition.plus(new Vector2d(robotOffset.getX(), -robotOffset.getY()));
-            visionPoseEstimate = visionPoseEstimate.plus(currentPoseEstimate.headingVec().times(offset));
-
-            synchronized (cumulativeHeadingMutex) {
-                cumulativeHeadingError += Math.abs(currentPoseEstimate.getHeading() - i.ftcPose.yaw);
-            }
-
-            // TODO: only correct distance from back wall.
-            Pose2d deltaPose = new Pose2d(visionPoseEstimate.minus(currentPoseEstimate.vec()), 0).times(covarianceGain);
-
-            odometry.addDeltaPose(deltaPose);
-            currentPoseEstimate = currentPoseEstimate.plus(deltaPose);
+            if (robotPosition.distTo(pose.vec()) < 70)
+                updateCallback.accept(robotPosition.minus(pose.vec()).times(K));
         }
 
-        return detections;
+        return null;
     }
 
-    public int getDetectedItems() {
-        return detectedItems.get();
+    private Vector2d fromVectorF(VectorF v) {
+        return new Vector2d(v.get(0), v.get(1));
     }
 
-    public double getAverageHeadingError() {
-        double average;
-        synchronized (cumulativeHeadingMutex) {
-            average = cumulativeHeadingError;
-        }
-        return average / detectedItems.get();
+
+    /** Converts an AprilTagPoseFtc object to a SimpleVector2d offset.
+     *
+     * <p>Add this value to the actual position of the april tag in order to get the camera position.
+     */
+    public Vector2d vectorOffset(AprilTagPoseFtc pose) {
+        // Yes, the x and y should be swapped, as the tags are parallel to the y axis
+        double a = pose.z/Math.tan(Math.PI/2 - Math.toRadians(CAMERA_ANGLE));
+
+        return new Vector2d(-(pose.y - a)*Math.cos(Math.toRadians(CAMERA_ANGLE)), pose.x).rotated(-pose.yaw);
     }
 
-    /** Creates a new instance using all of the default settings*/
-    public static AprilTagOdometryProcessor generate(OdometrySubsystem odometry, double fx, double fy, double cx, double cy) {
-        AprilTagOdometryProcessor instance = new AprilTagOdometryProcessor(
-                odometry, fx, fy, cx, cy, DistanceUnit.INCH, AngleUnit.RADIANS,
+    /** Generates a new AprilTagLocalizer instance with the inputted camera calibration.
+     *
+     * <p> Setting all parameters to zero will default to use the preset configuration
+     */
+    public static AprilTagOdometryProcessor generate(Supplier<Pose2d> currentPose, Consumer<Vector2d> updateCallback, double fx, double fy, double cx, double cy) {
+        AprilTagOdometryProcessor instance = new AprilTagOdometryProcessor(currentPose, updateCallback,
+                fx, fy, cx, cy, DistanceUnit.INCH, AngleUnit.RADIANS,
                 AprilTagGameDatabase.getCenterStageTagLibrary(),
                 false, false, true, true,
                 TagFamily.TAG_36h11, 3

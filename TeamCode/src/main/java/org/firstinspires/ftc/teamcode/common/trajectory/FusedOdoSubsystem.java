@@ -6,6 +6,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.IMU;
+
+import org.firstinspires.ftc.teamcode.common.utils.CachedIMU;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +21,23 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
 
     DcMotorEx left, right, front;
 
+    private final CachedIMU imu;
+
     private final Object mutex = new Object();
-    public FusedOdoSubsystem(DcMotorEx left, DcMotorEx right, DcMotorEx front) {
+    public FusedOdoSubsystem(IMU imu, DcMotorEx left, DcMotorEx right, DcMotorEx front, Pose2d initial) {
         super(Arrays.asList(
-                new Pose2d(0, par0YTicks*DriveSubsystem.ODO_IN_PER_TICK[1], 0),
                 new Pose2d(0, par1YTicks*DriveSubsystem.ODO_IN_PER_TICK[1], 0),
-                new Pose2d(perpXTicks*DriveSubsystem.ODO_IN_PER_TICK[1], Math.PI/2)
+                new Pose2d(0, par0YTicks*DriveSubsystem.ODO_IN_PER_TICK[1], 0),
+                new Pose2d(perpXTicks*DriveSubsystem.ODO_IN_PER_TICK[1], 0, Math.PI/2)
         ));
 
         this.left = left;
         this.right = right;
         this.front = front;
+
+        this.setPoseEstimate(initial);
+        this.imu = new CachedIMU(imu, 500, initial.getHeading());
+
     }
 
     @NonNull

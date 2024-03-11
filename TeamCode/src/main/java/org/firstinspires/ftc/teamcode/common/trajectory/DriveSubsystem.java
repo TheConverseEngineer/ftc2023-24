@@ -16,11 +16,13 @@ import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.common.command.Command;
@@ -65,6 +67,10 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
     private final FusedOdoSubsystem odometry;
 
     public DriveSubsystem(HardwareMap hardwareMap) {
+        this(hardwareMap, new Pose2d());
+    }
+
+    public DriveSubsystem(HardwareMap hardwareMap, Pose2d initialPose) {
         super(kV, kA, kStatic, DRIVETRAIN_TRACK_WIDTH, DRIVETRAIN_WHEEL_BASE, LATERAL_MULTIPLIER);
 
         // Note that under these constraints, the follower will basically never naturally exit the control mode
@@ -86,7 +92,17 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         // Set up odo
-        odometry = new FusedOdoSubsystem(leftFront, leftRear, rightFront);
+        IMU internal = hardwareMap.get(IMU.class, "emu");
+
+        IMU.Parameters parameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+                )
+        );
+
+        internal.initialize(parameters);
+        odometry = new FusedOdoSubsystem(internal, leftFront, leftRear, rightFront, initialPose);
     }
 
     @Override
