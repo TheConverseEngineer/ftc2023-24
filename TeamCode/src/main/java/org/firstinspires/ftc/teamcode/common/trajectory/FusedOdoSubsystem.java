@@ -37,6 +37,7 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
 
         this.setPoseEstimate(initial);
         this.imu = new CachedIMU(imu, 500, initial.getHeading());
+        this.imu.setCacheUpdateCallback(this::setHeading);
 
     }
 
@@ -60,8 +61,16 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
 
     @Override
     public void update() {
+        imu.getValue();
         synchronized (mutex) {
             super.update();
+        }
+    }
+
+    private void setHeading(double heading) {
+        synchronized (mutex) {
+            Pose2d current = super.getPoseEstimate();
+            super.setPoseEstimate(new Pose2d(current.getX(), current.getY(), heading));
         }
     }
 

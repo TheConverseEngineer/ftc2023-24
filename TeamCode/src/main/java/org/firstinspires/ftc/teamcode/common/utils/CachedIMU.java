@@ -18,6 +18,7 @@ public class CachedIMU extends CachingSensor implements IMU{
     public CachedIMU(IMU imu, long cacheDurationMs, double initialHeading) {
         super(cacheDurationMs, initialHeading);
         this.imu = imu;
+        this.imu.resetYaw();
         this.offset = initialHeading - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 

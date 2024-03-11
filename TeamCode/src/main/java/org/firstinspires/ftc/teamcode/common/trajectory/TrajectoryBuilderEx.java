@@ -58,4 +58,6 @@ public class TrajectoryBuilderEx {
         trajectoryBuilder.splineToSplineHeading(knot.getPose(), knot.splineHeading);
         return this;
     }
+
+
 }

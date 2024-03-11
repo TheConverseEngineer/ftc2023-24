@@ -51,6 +51,9 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
     private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, DRIVETRAIN_TRACK_WIDTH);
     private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
 
+    private static final TrajectoryVelocityConstraint FAST_VEL_CONSTRAINT = getVelocityConstraint(70, MAX_ANG_VEL, DRIVETRAIN_TRACK_WIDTH);
+    private static final TrajectoryAccelerationConstraint FAST_ACCEL_CONSTRAINT = getAccelerationConstraint(30);
+
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(6, 0, 0);
     public static PIDCoefficients ROTATIONAL_PID = new PIDCoefficients(5, 0, 0);
 
@@ -179,6 +182,10 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
 
     public TrajectoryBuilderEx buildTrajectory(Knot startPose) {
         return new TrajectoryBuilderEx(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    }
+
+    public TrajectoryBuilderEx buildTrajectory(Pose2d startPose, double splineHeading) {
+        return new TrajectoryBuilderEx(new Knot(startPose, Math.toDegrees(splineHeading)), VEL_CONSTRAINT, ACCEL_CONSTRAINT);
     }
 
     private void setTrajectory(Trajectory trajectory) {

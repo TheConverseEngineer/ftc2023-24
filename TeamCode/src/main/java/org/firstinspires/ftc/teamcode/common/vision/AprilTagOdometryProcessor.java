@@ -54,9 +54,9 @@ public class AprilTagOdometryProcessor extends AprilTagProcessorImpl {
             Vector2d tagPosition = fromVectorF(i.metadata.fieldPosition);
             Vector2d cameraPosition = tagPosition .plus (vectorOffset(i.ftcPose));
 
-            Vector2d robotPosition = cameraPosition .plus (new Vector2d(X_OFFSET, Y_OFFSET).rotated(-pose.getHeading()));
+            Vector2d robotPosition = cameraPosition .plus (new Vector2d(X_OFFSET, Y_OFFSET).rotated(pose.getHeading()));
 
-            if (robotPosition.distTo(pose.vec()) < 70)
+            if (robotPosition.distTo(pose.vec()) < 7)
                 updateCallback.accept(robotPosition.minus(pose.vec()).times(K));
         }
 
