@@ -72,4 +72,14 @@ public class DashboardManager {
         FtcDashboard.getInstance().sendTelemetryPacket(packet);
         packet = new TelemetryPacket();
     }
+
+    public static void drawRobot(TelemetryPacket packet, Pose2d pose) {
+        double x = pose.getX();
+        double y = pose.getY();
+        double theta = pose.getHeading();
+        packet.fieldOverlay()
+                .setStroke("blue")
+                .strokeCircle(x, y, 7)
+                .strokeLine(x, y, x+7*Math.cos(theta), y+7*Math.sin(theta));
+    }
 }

@@ -62,7 +62,7 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
 
     private boolean setFirstTrajectory = false;
 
-    private OdometrySubsystem odometry;
+    private final FusedOdoSubsystem odometry;
 
     public DriveSubsystem(HardwareMap hardwareMap) {
         super(kV, kA, kStatic, DRIVETRAIN_TRACK_WIDTH, DRIVETRAIN_WHEEL_BASE, LATERAL_MULTIPLIER);
@@ -86,12 +86,12 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         // Set up odo
-        odometry = new OdometrySubsystem(leftFront, leftRear, rightFront);
+        odometry = new FusedOdoSubsystem(leftFront, leftRear, rightFront);
     }
 
     @Override
     public void earlyPeriodic() {
-        odometry.updateTrackingWheels();
+        odometry.update();
     }
 
     public Pose2d getPosition() {
@@ -170,13 +170,13 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         follower.followTrajectory(trajectory);
     }
 
-    public OdometrySubsystem getOdometry() {
+    public FusedOdoSubsystem getOdometry() {
         return odometry;
     }
 
     @Override
     public void periodic() {
-        odometry.updateTrackingWheels();
+        odometry.update();
 
         if (!setFirstTrajectory) return; // Wait until the first trajectory has been scheduled.
 

@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.common.simulation.VirtualDummyMotorEx;
 import org.firstinspires.ftc.teamcode.common.trajectory.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.common.trajectory.FusedOdoSubsystem;
 import org.firstinspires.ftc.teamcode.common.trajectory.OdometrySubsystem;
 import org.firstinspires.ftc.teamcode.common.utils.DashboardManager;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagOdometryProcessor;
@@ -24,7 +25,7 @@ public class FullOdoTest extends CommandOpMode {
     AprilTagOdometryProcessor aprilTagProcessor;
 
 
-    OdometrySubsystem odometrySubsystem;
+    FusedOdoSubsystem odometrySubsystem;
 
     DriveSubsystem drive;
 
@@ -56,7 +57,6 @@ public class FullOdoTest extends CommandOpMode {
         //telemetry.addData("detected", aprilTagProcessor.getDetectedItems());
         //telemetry.addData("heading error", aprilTagProcessor.getAverageHeadingError());
         telemetry.addLine(odometrySubsystem.getPoseEstimate().toString());
-        telemetry.addLine(odometrySubsystem.getEncoderRaw());
 
         DashboardManager.getInstance().drawRobot(odometrySubsystem.getPoseEstimate());
     }
