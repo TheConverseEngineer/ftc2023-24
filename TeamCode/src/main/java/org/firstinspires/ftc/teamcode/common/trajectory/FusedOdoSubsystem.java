@@ -61,15 +61,23 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
 
     @Override
     public void update() {
-        imu.getValue();
         synchronized (mutex) {
+            imu.getValue();
             super.update();
         }
     }
 
-    private void setHeading(double heading) {
+    public void setHeading(double heading) {
         synchronized (mutex) {
             Pose2d current = super.getPoseEstimate();
+            super.setPoseEstimate(new Pose2d(current.getX(), current.getY(), heading));
+        }
+    }
+
+    public void setMHeading(double heading) {
+        synchronized (mutex) {
+            Pose2d current = super.getPoseEstimate();
+            imu.manualReset(heading);
             super.setPoseEstimate(new Pose2d(current.getX(), current.getY(), heading));
         }
     }

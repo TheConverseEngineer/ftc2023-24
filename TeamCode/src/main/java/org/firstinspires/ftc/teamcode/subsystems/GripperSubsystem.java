@@ -16,46 +16,64 @@ public class GripperSubsystem implements Subsystem {
     public static double RIGHT_SERVO_OPEN = .78;
     public static double LEFT_SERVO_OPEN = .30;
 
-    private final ServoImplEx rightServo, leftServo;
+    private final ServoImplEx upperClaw, lowerClaw;
+
+    private enum CLAW_STATE { OPEN, HALF_OPEN, CLOSED }
+    private CLAW_STATE currentClawState = CLAW_STATE.OPEN;
 
     /** Controls the two "finger joints" at the end of the claw */
     public GripperSubsystem(HardwareMap hardwareMap) {
-        rightServo = hardwareMap.get(ServoImplEx.class, "rightFinger");
-        leftServo = hardwareMap.get(ServoImplEx.class, "leftFinger");
-        leftServo.setPwmRange(new PwmControl.PwmRange(610, 2360));
-        rightServo.setPwmRange(new PwmControl.PwmRange(610, 2360));
+        lowerClaw = hardwareMap.get(ServoImplEx.class, "rightFinger");
+        upperClaw = hardwareMap.get(ServoImplEx.class, "leftFinger");
+        lowerClaw.setPwmRange(new PwmControl.PwmRange(610, 2360));
+        upperClaw.setPwmRange(new PwmControl.PwmRange(610, 2360));
     }
 
     /** Opens both sides of the claw */
     public void openClaw() {
-        rightServo.setPosition(RIGHT_SERVO_OPEN);
-        leftServo.setPosition(LEFT_SERVO_OPEN);
+        currentClawState = CLAW_STATE.OPEN;
+        lowerClaw.setPosition(.8);
+        upperClaw.setPosition(.2);
     }
 
     /** Closes both sides of the claw */
     public void closeClaw(){
-        rightServo.setPosition(RIGHT_SERVO_CLOSE);
-        leftServo.setPosition(LEFT_SERVO_CLOSE);
+        currentClawState = CLAW_STATE.CLOSED;
+        lowerClaw.setPosition(.55);
+        upperClaw.setPosition(.5);
+    }
+
+    public void toggleIntake() {
+        if (currentClawState == CLAW_STATE.OPEN) {
+            closeClaw();
+        } else openClaw();
+    }
+
+    public void toggleDeposit() {
+        switch (currentClawState) {
+            case OPEN:
+                closeClaw(); break;
+            case HALF_OPEN:
+                openClaw(); break;
+            case CLOSED:
+                halfOpenClaw(); break;
+        }
+    }
+
+    public void halfOpenClaw() {
+        currentClawState = CLAW_STATE.HALF_OPEN;
+        lowerClaw.setPosition(.55);
+        upperClaw.setPosition(.2);
     }
 
     /** Opens only the right claw */
     public void openRightClaw(){
-        rightServo.setPosition(RIGHT_SERVO_OPEN);
+
     }
 
     /** Opens only the left claw */
     public void openLeftClaw(){
-        leftServo.setPosition(LEFT_SERVO_OPEN);
-    }
 
-    /** Closes only the right claw */
-    public void closeRightClaw(){
-        rightServo.setPosition(RIGHT_SERVO_CLOSE);
-    }
-
-    /** Closes only the left claw */
-    public void closeLeftClaw(){
-        leftServo.setPosition(LEFT_SERVO_CLOSE);
     }
 
     @Override

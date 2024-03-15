@@ -21,12 +21,12 @@ public class WristSubsystem implements Subsystem {
     public WristSubsystem(HardwareMap hardwareMap) {
         lowerWrist = hardwareMap.get(ServoImplEx.class, "lowerWrist");
         upperWrist = new ProfiledServo(hardwareMap, "upperWrist", .71);
-        lowerWrist.setPosition(.67);
+        lowerWrist.setPosition(.5);
     }
 
     public void intakePosition() {
-        lowerWrist.setPosition(LOWER_WRIST_INTAKE);
-        upperWrist.setPosition(UPPER_WRIST_INTAKE);
+        lowerWrist.setPosition(0.5);
+        upperWrist.setPosition(0.245);
     }
 
     public void spikeDropPosition() {
@@ -39,24 +39,19 @@ public class WristSubsystem implements Subsystem {
         lowerWrist.setPosition(0.43);
     }
 
-    public void stackBottomIntakePos() {
-        upperWrist.setPosition(0.25);
-        lowerWrist.setPosition(0.40);
-    }
-
     public void idlePosition() {
-        lowerWrist.setPosition(LOWER_WRIST_OUTTAKE);
-        upperWrist.setPosition(UPPER_WRIST_OUTTAKE);
+        lowerWrist.setPosition(0.5);
+        upperWrist.setPosition(0.72);
     }
 
     public void outtakePosition() {
-        lowerWrist.setPosition(.20);
-        upperWrist.setPosition(.59);
+        lowerWrist.setPosition(0.5);
+        upperWrist.setPosition(0.73);
     }
 
     public void transferPosition() {
-        upperWrist.setPosition(UPPER_WRIST_OUTTAKE);
-        lowerWrist.setPosition(0.3);
+        lowerWrist.setPosition(0.5);
+        upperWrist.setPosition(0.72);
     }
 
     public void visionOuttakePosition() {

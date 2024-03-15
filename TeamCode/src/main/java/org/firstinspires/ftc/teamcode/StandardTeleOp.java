@@ -22,7 +22,7 @@ public class StandardTeleOp extends CommandOpMode {
     public enum SlideState{LOWERED, RAISING, LOWERING, RAISED}
 
     private SlideState currentSlideState = SlideState.LOWERED;
-    private int currentStackTarget = 0;
+    private int currentStackTarget = 2;
 
     @Override
     public void initialize() {
@@ -52,7 +52,7 @@ public class StandardTeleOp extends CommandOpMode {
             @Override
             public void onPress(boolean value) {
                 currentStackTarget += 2;
-                currentStackTarget = (int)MathUtils.clamp(currentStackTarget, 0, 20);
+                currentStackTarget = (int)MathUtils.clamp(currentStackTarget, 2, 20);
             }
         });
 
@@ -60,15 +60,15 @@ public class StandardTeleOp extends CommandOpMode {
             @Override
             public void onPress(boolean value) {
                 currentStackTarget -= 2;
-                currentStackTarget = (int)MathUtils.clamp(currentStackTarget, 0, 20);
+                currentStackTarget = (int)MathUtils.clamp(currentStackTarget, 2, 20);
             }
         });
 
         driver.add("close claw", driver.new LeftBumperToggleButton() {
             @Override
             public void onPress(boolean value) {
-                if (value) gripper.closeClaw();
-                else gripper.openClaw();
+                if (currentSlideState == SlideState.RAISED) gripper.toggleDeposit();
+                else gripper.toggleIntake();
             }
         });
 
@@ -111,23 +111,19 @@ public class StandardTeleOp extends CommandOpMode {
 
         // Heading resets
         if (gamepad2.dpad_left) {
-            Pose2d currentPose = drive.getOdometry().getPoseEstimate();
-            drive.getOdometry().setPoseEstimate(new Pose2d(currentPose.getX(), currentPose.getY(), Math.PI/2));
+            drive.getOdometry().setMHeading(Math.PI/2);
         }
 
         if (gamepad2.dpad_right) {
-            Pose2d currentPose = drive.getOdometry().getPoseEstimate();
-            drive.getOdometry().setPoseEstimate(new Pose2d(currentPose.getX(), currentPose.getY(), -Math.PI/2));
+            drive.getOdometry().setMHeading(-Math.PI/2);
         }
 
         if (gamepad2.dpad_up) {
-            Pose2d currentPose = drive.getOdometry().getPoseEstimate();
-            drive.getOdometry().setPoseEstimate(new Pose2d(currentPose.getX(), currentPose.getY(), 0));
+            drive.getOdometry().setMHeading(0);
         }
 
         if (gamepad2.dpad_down) {
-            Pose2d currentPose = drive.getOdometry().getPoseEstimate();
-            drive.getOdometry().setPoseEstimate(new Pose2d(currentPose.getX(), currentPose.getY(), Math.PI));
+            drive.getOdometry().setMHeading(Math.PI);
         }
 
         // FSM which controls the slides and arms

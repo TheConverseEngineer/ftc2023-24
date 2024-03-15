@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class CachedIMU extends CachingSensor implements IMU{
 
     private final IMU imu;
-    private final double offset;
+    private double offset;
 
     public CachedIMU(IMU imu, long cacheDurationMs, double initialHeading) {
         super(cacheDurationMs, initialHeading);
@@ -85,5 +85,9 @@ public class CachedIMU extends CachingSensor implements IMU{
     @Override
     public void close() {
         imu.close();
+    }
+
+    public void manualReset(double newHeading) {
+        this.offset = newHeading - imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
     }
 }
