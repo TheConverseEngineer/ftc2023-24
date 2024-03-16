@@ -25,8 +25,6 @@ public class TeamElementDetectionPipeline implements VisionProcessor {
     public static int[] leftCoords = new int[]{90, 25, 150, 90};
     public static int[] centerCoords = new int[]{335, 28, 380, 75};
 
-
-
     private final Mat   leftLAB = new Mat(),
                         rightLAB = new Mat(),
                         centerLAB = new Mat();

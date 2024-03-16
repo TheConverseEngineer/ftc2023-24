@@ -21,10 +21,10 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
 
     DcMotorEx left, right, front;
 
-    private final CachedIMU imu;
+   // private final CachedIMU imu;
 
     private final Object mutex = new Object();
-    public FusedOdoSubsystem(IMU imu, DcMotorEx left, DcMotorEx right, DcMotorEx front, Pose2d initial) {
+    public FusedOdoSubsystem(DcMotorEx left, DcMotorEx right, DcMotorEx front, Pose2d initial) {
         super(Arrays.asList(
                 new Pose2d(0, par1YTicks*DriveSubsystem.ODO_IN_PER_TICK[1], 0),
                 new Pose2d(0, par0YTicks*DriveSubsystem.ODO_IN_PER_TICK[1], 0),
@@ -36,8 +36,8 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
         this.front = front;
 
         this.setPoseEstimate(initial);
-        this.imu = new CachedIMU(imu, 500, initial.getHeading());
-        this.imu.setCacheUpdateCallback(this::setHeading);
+        //this.imu = new CachedIMU(imu, 500, initial.getHeading());
+        //this.imu.setCacheUpdateCallback(this::setHeading);
 
     }
 
@@ -62,7 +62,7 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
     @Override
     public void update() {
         synchronized (mutex) {
-            imu.getValue();
+            //imu.getValue();
             super.update();
         }
     }
@@ -77,7 +77,7 @@ public class FusedOdoSubsystem extends ThreeTrackingWheelLocalizer {
     public void setMHeading(double heading) {
         synchronized (mutex) {
             Pose2d current = super.getPoseEstimate();
-            imu.manualReset(heading);
+            //imu.manualReset(heading);
             super.setPoseEstimate(new Pose2d(current.getX(), current.getY(), heading));
         }
     }

@@ -40,7 +40,7 @@ public class FullOdoTest extends CommandOpMode {
 
         enableDashboard();
 
-        drive = new DriveSubsystem(hardwareMap, startKnot.getPose());
+        drive = new DriveSubsystem(hardwareMap);
         odometrySubsystem = drive.getOdometry();
 
         localizer = AprilTagOdometryProcessor.generate(
@@ -54,7 +54,7 @@ public class FullOdoTest extends CommandOpMode {
         portal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(CameraName.class, "webcam 1"))
                 .setCameraResolution(new Size(640, 360))
-                .addProcessor(localizer)
+                //.addProcessor(localizer)
                 .addProcessor(elementDetection)
                 .build();
 

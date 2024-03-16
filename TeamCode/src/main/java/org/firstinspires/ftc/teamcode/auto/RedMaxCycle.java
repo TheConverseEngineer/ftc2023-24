@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.teamcode.vision.VisionSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.opencv.core.Mat;
 
-@TeleOp(name = "Red 2+5") @Config
+@TeleOp(name = "Red 2+5") @Config @Disabled
 public class RedMaxCycle extends CommandOpMode {
     DriveSubsystem drive;
     VisionSubsystem camera;

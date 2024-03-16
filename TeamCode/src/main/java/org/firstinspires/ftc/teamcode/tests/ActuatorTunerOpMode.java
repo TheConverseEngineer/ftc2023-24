@@ -1,14 +1,15 @@
 package org.firstinspires.ftc.teamcode.tests;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.common.utils.DashboardManager;
 import org.firstinspires.ftc.teamcode.subsystems.SlideSubsystem;
 
-@Config
 @TeleOp
+@Disabled
 public class ActuatorTunerOpMode extends CommandOpMode {
     private SlideSubsystem actuator;
 

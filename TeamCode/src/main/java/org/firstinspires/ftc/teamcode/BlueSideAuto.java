@@ -46,7 +46,9 @@ public class BlueSideAuto extends CommandOpMode {
                                depositCY = -24.37,
                                depositRY = -30.3;
 
-    public static double spikeExtensionWait = 1;
+    public static double spikeExtensionWait = 2;
+
+    public static Knot parkingKnot = new Knot(47, 2, 180, 0);
 
     @Override
     public void initialize() {
@@ -83,6 +85,18 @@ public class BlueSideAuto extends CommandOpMode {
                 .splineToConstantHeading(new Knot(depositX, depositCY, 180, 0))
                 .build();
 
+        Trajectory fromRightVision = drive.buildTrajectory(new Knot(depositX, depositRY, 180, 180))
+                        .splineToConstantHeading(parkingKnot)
+                        .build();
+
+        Trajectory fromCenterVision = drive.buildTrajectory(new Knot(depositX, depositCY, 180, 180))
+                .splineToConstantHeading(parkingKnot)
+                .build();
+
+        Trajectory fromLeftVision = drive.buildTrajectory(new Knot(depositX, depositLY, 180, 180))
+                .splineToConstantHeading(parkingKnot)
+                .build();
+
         gripper.closeClaw();
 
         scheduler.scheduleCommand(new SequentialCommand(
@@ -115,10 +129,15 @@ public class BlueSideAuto extends CommandOpMode {
                                             new InstantCommand(() -> actuator.setArmTarget(120)),
                                             new WaitCommand(0.1),
                                             new InstantCommand(wrist::visionOuttakePosition),
-                                            new WaitUntilCommand(() -> Math.abs(actuator.armPosition - 2) < 0.03)
+                                            new WaitUntilCommand(()  -> Math.abs(actuator.armPosition - 2) < 0.03)
                                     )
                                 ),
-                                new InstantCommand(gripper::openRightClaw)
+                                new InstantCommand(gripper::openRightClaw),
+                                new WaitCommand(2),
+                                new InstantCommand(wrist::transferPosition),
+                                new InstantCommand(() -> actuator.setArmTarget(0)),
+                                new InstantCommand(() -> actuator.setSlideTarget(0)),
+                                drive.followTrajectory(fromLeftVision)
                             ));
                             break;
                         case CENTER:
@@ -148,7 +167,12 @@ public class BlueSideAuto extends CommandOpMode {
                                         new WaitUntilCommand(() -> Math.abs(actuator.armPosition - 2) < 0.03)
                                     )
                                 ),
-                                new InstantCommand(gripper::openRightClaw)
+                                new InstantCommand(gripper::openRightClaw),
+                                new WaitCommand(2),
+                                new InstantCommand(wrist::transferPosition),
+                                new InstantCommand(() -> actuator.setArmTarget(0)),
+                                new InstantCommand(() -> actuator.setSlideTarget(0)),
+                                drive.followTrajectory(fromCenterVision)
                             ));
                             break;
                         case RIGHT:
@@ -178,7 +202,12 @@ public class BlueSideAuto extends CommandOpMode {
                                         new WaitUntilCommand(() -> Math.abs(actuator.armPosition - 2) < 0.03)
                                     )
                                 ),
-                                new InstantCommand(gripper::openRightClaw)
+                                new InstantCommand(gripper::openRightClaw),
+                                new WaitCommand(2),
+                                new InstantCommand(wrist::transferPosition),
+                                new InstantCommand(() -> actuator.setArmTarget(0)),
+                                new InstantCommand(() -> actuator.setSlideTarget(0)),
+                                drive.followTrajectory(fromRightVision)
                             ));
                             break;
                     }

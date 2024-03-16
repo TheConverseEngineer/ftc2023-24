@@ -4,8 +4,11 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 
 import android.util.Size;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -27,12 +30,17 @@ import org.firstinspires.ftc.teamcode.subsystems.WristSubsystem;
 import org.firstinspires.ftc.teamcode.vision.TeamElementDetectionPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
-@TeleOp
+import java.util.concurrent.atomic.AtomicBoolean;
+
+@Autonomous
+@Config
 public class RedVisionAuto extends CommandOpMode {
     DriveSubsystem drive;
     SlideSubsystem actuator;
     WristSubsystem wrist;
     GripperSubsystem gripper;
+
+    AtomicBoolean generationComplete = new AtomicBoolean(false);
 
     public static final Knot startKnot = new Knot(13.173, -64.541, -90, 90),
             spikeIntermediate = new Knot(34.5, -47, 180, 0),
@@ -78,40 +86,12 @@ public class RedVisionAuto extends CommandOpMode {
         portal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(CameraName.class, "webcam 1"))
                 .setCameraResolution(new Size(640, 360))
-                .addProcessor(localizer)
+                //.addProcessor(localizer)
                 .addProcessor(elementDetection)
                 .build();
 
-
-        Trajectory lrSpike = drive.buildTrajectory(startKnot)
-                .splineToSplineHeading(spikeIntermediate)
-                .splineToConstantHeading(lrSpikeDeposit)
-                .build();
-
-        Trajectory cSpike = drive.buildTrajectory(startKnot)
-                .splineToSplineHeading(spikeIntermediate)
-                .splineToConstantHeading(centerSpikeDeposit)
-                .build();
-
-        Trajectory toLeftVision = drive.buildTrajectory(new Knot(lrSpikeDeposit.x, lrSpikeDeposit.y, 180, 0))
-                .splineToConstantHeading(new Knot(depositX, depositLY, 180, 0))
-                .build();
-
-
-        Trajectory toRightVision = drive.buildTrajectory(new Knot(lrSpikeDeposit.x, lrSpikeDeposit.y, 180, 0))
-                .splineToConstantHeading(new Knot(depositX, depositRY, 180, 0))
-                .build();
-
-
-        Trajectory toCenterVision = drive.buildTrajectory(new Knot(centerSpikeDeposit.x, centerSpikeDeposit.y, 180, 0))
-                .splineToConstantHeading(new Knot(depositX, depositCY, 180, 0))
-                .build();
-
-
-        left = generateAuto(lrSpike, rightSpikeExtension, toRightVision);
-        right = generateAuto(lrSpike, leftSpikeExtension, toLeftVision);
-        center = generateAuto(cSpike, centerSpikeExtension, toCenterVision);
-
+        Thread generationThread = new Thread(this::generateAllPaths);
+        generationThread.start();
     }
 
     @Override
@@ -134,6 +114,7 @@ public class RedVisionAuto extends CommandOpMode {
     @Override
     protected void initLoop() {
         telemetry.addData("v", elementDetection.getDetection());
+        telemetry.addData("complete", generationComplete.get());
         telemetry.update();
     }
 
@@ -173,5 +154,36 @@ public class RedVisionAuto extends CommandOpMode {
                 ),
                 new InstantCommand(gripper::openClaw)
         );
+    }
+
+    private void generateAllPaths() {
+        Trajectory lrSpike = drive.buildTrajectory(startKnot)
+                .splineToSplineHeading(spikeIntermediate)
+                .splineToConstantHeading(new Vector2d(38.5, -37.5), -90)
+                .build();
+
+        Trajectory cSpike = drive.buildTrajectory(startKnot)
+                .splineToSplineHeading(spikeIntermediate)
+                .splineToConstantHeading(centerSpikeDeposit)
+                .build();
+
+        Trajectory toLeftVision = drive.buildTrajectory(new Knot(lrSpikeDeposit.x, lrSpikeDeposit.y, 180, 0))
+                .splineToConstantHeading(new Knot(depositX, depositLY, 180, 0))
+                .build();
+
+
+        Trajectory toRightVision = drive.buildTrajectory(new Knot(lrSpikeDeposit.x, lrSpikeDeposit.y, 180, 0))
+                .splineToConstantHeading(new Knot(depositX, depositRY, 180, 0))
+                .build();
+
+        Trajectory toCenterVision = drive.buildTrajectory(new Knot(centerSpikeDeposit.x, centerSpikeDeposit.y, 180, 0))
+                .splineToConstantHeading(new Knot(depositX, depositCY, 180, 0))
+                .build();
+
+        left = generateAuto(lrSpike, rightSpikeExtension, toRightVision);
+        right = generateAuto(lrSpike, leftSpikeExtension, toLeftVision);
+        center = generateAuto(cSpike, centerSpikeExtension, toCenterVision);
+
+        generationComplete.set(true);
     }
 }

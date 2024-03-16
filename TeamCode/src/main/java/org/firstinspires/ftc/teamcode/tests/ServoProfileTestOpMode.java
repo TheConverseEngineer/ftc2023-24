@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.tests;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.common.utils.ProfiledServo;
 
-@TeleOp
+@TeleOp @Disabled
 public class ServoProfileTestOpMode extends CommandOpMode {
 
     ProfiledServo upperWrist;

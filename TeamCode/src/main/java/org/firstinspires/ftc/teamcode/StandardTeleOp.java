@@ -2,6 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.CRServoImplEx;
+import com.qualcomm.robotcore.hardware.PwmControl;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ServoImplEx;
 
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.common.trajectory.DriveSubsystem;
@@ -18,6 +23,9 @@ public class StandardTeleOp extends CommandOpMode {
     DriveSubsystem drive;
     WristSubsystem wrist;
 
+    CRServoImplEx rightClimb, leftClimb;
+    Servo drone;
+
 
     public enum SlideState{LOWERED, RAISING, LOWERING, RAISED}
 
@@ -26,11 +34,17 @@ public class StandardTeleOp extends CommandOpMode {
 
     @Override
     public void initialize() {
-
+        drone = hardwareMap.get(Servo.class, "drone");
+        drone.setPosition(0.39);
         slideSubsystem = new SlideSubsystem(hardwareMap);
         gripper = new GripperSubsystem(hardwareMap);
         drive = new DriveSubsystem(hardwareMap);
         wrist = new WristSubsystem(hardwareMap);
+
+        rightClimb = hardwareMap.get(CRServoImplEx.class, "rightClimb");
+        leftClimb = hardwareMap.get(CRServoImplEx.class, "leftClimb");
+        rightClimb.setPwmRange(new PwmControl.PwmRange(500, 2500));
+        leftClimb.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
         scheduler.registerSubsystem(slideSubsystem, gripper, drive, wrist);
 
@@ -107,7 +121,14 @@ public class StandardTeleOp extends CommandOpMode {
     @Override
     public void run() {
 
+        if (gamepad2.start) {
+            drone.setPosition(0.67);
+        }
+
         drive.driveWithGamepad(gamepad1);
+
+        rightClimb.setPower(gamepad2.right_stick_y);
+        leftClimb.setPower(gamepad2.left_stick_y);
 
         // Heading resets
         if (gamepad2.dpad_left) {

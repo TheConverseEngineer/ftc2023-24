@@ -36,6 +36,7 @@ public abstract class CommandOpMode extends LinearOpMode {
         modules.forEach(module -> module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
 
         while (opModeInInit() && !isStopRequested()) {
+            modules.forEach(LynxModule::clearBulkCache);
             initLoop();
         }
 

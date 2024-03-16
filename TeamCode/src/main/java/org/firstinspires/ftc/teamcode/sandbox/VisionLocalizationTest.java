@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.sandbox;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
-@TeleOp
+@TeleOp @Disabled
 public class VisionLocalizationTest extends CommandOpMode {
 
     DcMotor front = new VirtualDummyMotorEx(),

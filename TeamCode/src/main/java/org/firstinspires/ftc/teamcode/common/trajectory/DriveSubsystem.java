@@ -94,18 +94,7 @@ public class DriveSubsystem extends MecanumDrive implements Subsystem {
         // Get the voltage sensor
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        // Set up odo
-        IMU internal = hardwareMap.get(IMU.class, "emu");
-
-        IMU.Parameters parameters = new IMU.Parameters(
-                new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
-                )
-        );
-
-        internal.initialize(parameters);
-        odometry = new FusedOdoSubsystem(internal, leftFront, leftRear, rightFront, initialPose);
+        odometry = new FusedOdoSubsystem(leftFront, leftRear, rightFront, initialPose);
     }
 
     @Override
