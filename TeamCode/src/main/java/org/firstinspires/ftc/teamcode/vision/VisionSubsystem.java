@@ -22,7 +22,7 @@ public class VisionSubsystem implements Subsystem {
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
                 .addProcessor(detectionPipeline)
-                .setCameraResolution(new Size(1280, 720))
+                .setCameraResolution(new Size(640, 360))
                 .enableLiveView(true)
                 .setAutoStopLiveView(true)
                 .setStreamFormat(VisionPortal.StreamFormat.YUY2)

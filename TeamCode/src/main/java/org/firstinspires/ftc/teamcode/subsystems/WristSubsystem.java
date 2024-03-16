@@ -30,8 +30,8 @@ public class WristSubsystem implements Subsystem {
     }
 
     public void spikeDropPosition() {
-        upperWrist.setPosition(.26);
-        lowerWrist.setPosition(.41);
+        upperWrist.setPosition(0.27);
+        lowerWrist.setPosition(0.52);
     }
 
     public void stackTopIntakePos() {

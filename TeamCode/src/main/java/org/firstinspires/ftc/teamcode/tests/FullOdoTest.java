@@ -6,48 +6,58 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.common.command.CommandOpMode;
 import org.firstinspires.ftc.teamcode.common.simulation.VirtualDummyMotorEx;
 import org.firstinspires.ftc.teamcode.common.trajectory.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.common.trajectory.FusedOdoSubsystem;
+import org.firstinspires.ftc.teamcode.common.trajectory.Knot;
 import org.firstinspires.ftc.teamcode.common.trajectory.OdometrySubsystem;
 import org.firstinspires.ftc.teamcode.common.utils.DashboardManager;
 import org.firstinspires.ftc.teamcode.common.vision.AprilTagOdometryProcessor;
+import org.firstinspires.ftc.teamcode.vision.TeamElementDetectionPipeline;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 
 @TeleOp
-@Disabled
 public class FullOdoTest extends CommandOpMode {
 
     VisionPortal visionPortal;
     AprilTagOdometryProcessor aprilTagProcessor;
+    public static final Knot startKnot = new Knot(13.173, -64.541, -90, 90);
 
 
     FusedOdoSubsystem odometrySubsystem;
 
     DriveSubsystem drive;
+    AprilTagOdometryProcessor localizer;
+    TeamElementDetectionPipeline elementDetection;
+    VisionPortal portal;
 
     @Override
     public void initialize() {
 
         enableDashboard();
 
-        drive = new DriveSubsystem(hardwareMap);
+        drive = new DriveSubsystem(hardwareMap, startKnot.getPose());
         odometrySubsystem = drive.getOdometry();
 
-        //aprilTagProcessor = AprilTagOdometryProcessor.generate(
-          //       odometrySubsystem,757.2307669, 751.5267343, 484.4751617, 337.4213896
-        //);
+        localizer = AprilTagOdometryProcessor.generate(
+                drive.getOdometry()::getPoseEstimate,
+                drive.getOdometry()::applyOffset,
+                0,0,0,0
+        );
 
-        /*visionPortal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .setCameraResolution(new Size(1024, 576))
-                .enableLiveView(true)
-                .addProcessor(aprilTagProcessor)
+        elementDetection = new TeamElementDetectionPipeline(TeamElementDetectionPipeline.Alliance.RED);
+
+        portal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(CameraName.class, "webcam 1"))
+                .setCameraResolution(new Size(640, 360))
+                .addProcessor(localizer)
+                .addProcessor(elementDetection)
                 .build();
-*/
+
         scheduler.registerSubsystem(drive);
     }
 
@@ -57,6 +67,7 @@ public class FullOdoTest extends CommandOpMode {
         //telemetry.addData("detected", aprilTagProcessor.getDetectedItems());
         //telemetry.addData("heading error", aprilTagProcessor.getAverageHeadingError());
         telemetry.addLine(odometrySubsystem.getPoseEstimate().toString());
+        telemetry.update();
 
         DashboardManager.getInstance().drawRobot(odometrySubsystem.getPoseEstimate());
     }

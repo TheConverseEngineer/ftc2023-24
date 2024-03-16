@@ -35,7 +35,9 @@ public abstract class CommandOpMode extends LinearOpMode {
         List<LynxModule> modules = hardwareMap.getAll(LynxModule.class);
         modules.forEach(module -> module.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL));
 
-        waitForStart();
+        while (opModeInInit() && !isStopRequested()) {
+            initLoop();
+        }
 
         begin();
 
@@ -71,10 +73,12 @@ public abstract class CommandOpMode extends LinearOpMode {
                 telemetry.addData("update", "true");
             }
 
-            telemetry.update();
+            //telemetry.update();
         }
 
     }
+
+    protected void initLoop() { }
 
     /** Call this method at the start of init to use a simulator instead of the actual robot. */
     protected final void enableSimMode(Pose2d startPose) {

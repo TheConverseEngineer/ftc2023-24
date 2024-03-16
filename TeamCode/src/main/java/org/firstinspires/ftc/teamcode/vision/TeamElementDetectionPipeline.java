@@ -21,9 +21,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Config
 public class TeamElementDetectionPipeline implements VisionProcessor {
 
-    public static int[] rightCoords = new int[]{1130, 80, 1270, 220};
-    public static int[] leftCoords = new int[]{180, 50, 300, 180};
-    public static int[] centerCoords = new int[]{670, 55, 760, 150};
+    public static int[] rightCoords = new int[]{565, 40, 635, 110};
+    public static int[] leftCoords = new int[]{90, 25, 150, 90};
+    public static int[] centerCoords = new int[]{335, 28, 380, 75};
 
 
 
@@ -35,11 +35,10 @@ public class TeamElementDetectionPipeline implements VisionProcessor {
     public enum Detection {LEFT, CENTER, RIGHT}
 
     private final Alliance currentAlliance;
-    private final int[] detectionCounters = new int[]{0, 0, 0}; // LEFT, CENTER, RIGHT
+    private final RollingWindow detections = new RollingWindow();
     private final AtomicInteger framesAnalyzed = new AtomicInteger(0);
-    private final Object detectionAccessLock = new Object();
 
-    private final AtomicBoolean processorEnabled = new AtomicBoolean(false);
+    private final AtomicBoolean processorEnabled = new AtomicBoolean(true);
 
     public TeamElementDetectionPipeline(Alliance currentAlliance) {
         this.currentAlliance = currentAlliance;
@@ -76,30 +75,23 @@ public class TeamElementDetectionPipeline implements VisionProcessor {
         // Release the LAB mats (this one is actually important, because the GC collects these implicitly for some reason)
         leftLAB.release(); rightLAB.release(); centerLAB.release();
 
-        synchronized (detectionAccessLock) {
-            if (this.currentAlliance == Alliance.BLUE) {
-                // Minimum value of channel index 2
-                if (leftAverage.val[2] < rightAverage.val[2] && leftAverage.val[2] < centerAverage.val[2]) detectionCounters[0]++;
-                else if (leftAverage.val[2] > rightAverage.val[2] && rightAverage.val[2] < centerAverage.val[2]) detectionCounters[2]++;
-                else detectionCounters[1]++;
-            } else {
-                if (leftAverage.val[1] > rightAverage.val[1] && leftAverage.val[1] > centerAverage.val[1]) detectionCounters[0]++;
-                else if (leftAverage.val[1] < rightAverage.val[1] && rightAverage.val[1] > centerAverage.val[1]) detectionCounters[2]++;
-                else detectionCounters[1]++;
-            }
+        if (this.currentAlliance == Alliance.BLUE) {
+            // Minimum value of channel index 2
+            if (leftAverage.val[2] < rightAverage.val[2] && leftAverage.val[2] < centerAverage.val[2]) detections.addReading(0);
+            else if (leftAverage.val[2] > rightAverage.val[2] && rightAverage.val[2] < centerAverage.val[2]) detections.addReading(2);
+            else detections.addReading(1);
+        } else {
+            if (leftAverage.val[1] > rightAverage.val[1] && leftAverage.val[1] > centerAverage.val[1]) detections.addReading(0);
+            else if (leftAverage.val[1] < rightAverage.val[1] && rightAverage.val[1] > centerAverage.val[1]) detections.addReading(2);
+            else detections.addReading(1);
         }
+
 
         return null;
     }
 
     public Detection getDetection() {
-        synchronized (detectionAccessLock) {
-            if (detectionCounters[0] > detectionCounters[1] && detectionCounters[0] > detectionCounters[2])
-                return Detection.LEFT;
-            else if (detectionCounters[1] > detectionCounters[0] && detectionCounters[1] > detectionCounters[2])
-                return Detection.CENTER;
-            else return Detection.RIGHT;
-        }
+        return detections.getMax();
     }
 
     public int getFramesAnalyzed() {
@@ -131,8 +123,6 @@ public class TeamElementDetectionPipeline implements VisionProcessor {
     @NonNull
     @Override
     public String toString() {
-        synchronized (detectionAccessLock) {
-            return String.format("%d %d %d", detectionCounters[0], detectionCounters[1], detectionCounters[2]);
-        }
+        return detections.getMax().toString();
     }
 }
