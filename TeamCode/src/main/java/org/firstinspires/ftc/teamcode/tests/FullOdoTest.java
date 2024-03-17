@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.tests;
 
 import android.util.Size;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -40,7 +41,7 @@ public class FullOdoTest extends CommandOpMode {
 
         enableDashboard();
 
-        drive = new DriveSubsystem(hardwareMap);
+        drive = new DriveSubsystem(hardwareMap, new Pose2d(0, 0, -Math.PI/2)); //use radians for this only
         odometrySubsystem = drive.getOdometry();
 
         localizer = AprilTagOdometryProcessor.generate(

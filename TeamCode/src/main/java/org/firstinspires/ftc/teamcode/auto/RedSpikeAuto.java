@@ -54,11 +54,11 @@ public class RedSpikeAuto extends CommandOpMode {
                 .addProcessor(elementDetection)
                 .build();
 
-         center = drive.buildTrajectory(startKnot)
+        center = drive.buildTrajectory(startKnot)
                 .splineToConstantHeading(new Vector2d(0, 27), 0)
                 .build();
 
-         right = drive.buildTrajectory(startKnot)
+        right = drive.buildTrajectory(startKnot)
                 .splineToConstantHeading(new Vector2d(24, 12), 90)
                 .build();
 

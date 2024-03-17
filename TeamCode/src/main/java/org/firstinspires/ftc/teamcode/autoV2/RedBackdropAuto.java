@@ -11,12 +11,12 @@ import org.firstinspires.ftc.teamcode.vision.TeamElementDetectionPipeline;
 public class RedBackdropAuto extends AutoBaseClass{
     @Override
     protected Knot intermediateSpikePoint() {
-        return new Knot(0, 0, 0, 0); // TODO: Replace these coordinates with the intermediate position
+        return new Knot(29, 18, 180, 0); // TODO: Replace these coordinates with the intermediate position
     }
 
     @Override
     protected TeamElementDetectionPipeline.Alliance getAlliance() {
-        return TeamElementDetectionPipeline.Alliance.RED;
+        return TeamElementDetectionPipeline.Alliance.RED; //change this
     }
 
     @Override
@@ -29,9 +29,14 @@ public class RedBackdropAuto extends AutoBaseClass{
     @Override
     protected void onInit() {
         right = generateAutoPath(
-                90, 0, new Vector2d(0,0), new Vector2d(0,0); // TODO: replace these coordinates with the appropriate values
+                90, 0, new Vector2d(7,26), new Vector2d(41,18) // TODO: replace these coordinates with the appropriate values
+        ); //first is where the robot should be for spike should be, where the robot should be for second is where the backdrop should be
+        left = generateAutoPath(
+                90, 0, new Vector2d(43,27), new Vector2d(43,27) // TODO: replace these coordinates with the appropriate values
         );
-
+        center = generateAutoPath(
+                90, 0, new Vector2d(28,26), new Vector2d(42,23) // TODO: replace these coordinates with the appropriate values
+        );
         //TODO: also make the center and left paths
     }
 
@@ -40,6 +45,15 @@ public class RedBackdropAuto extends AutoBaseClass{
         TeamElementDetectionPipeline.Detection detection = getVisionDetection();
         if (detection == TeamElementDetectionPipeline.Detection.RIGHT) {
             scheduler.scheduleCommand(right);
-        } // TODO: repeat this for center and left
+        }         else if (detection == TeamElementDetectionPipeline.Detection.LEFT) {
+            scheduler.scheduleCommand(left);
+        }         else if (detection == TeamElementDetectionPipeline.Detection.CENTER) {
+            scheduler.scheduleCommand(center);
+        }
+
+
+        disableWebcam();
+
+        // TODO: repeat this for center and left DONE
     }
 }
