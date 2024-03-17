@@ -37,7 +37,7 @@ public abstract class AutoBaseClass extends CommandOpMode {
     @Override
     public void initialize() {
         // Subsystems
-        drive = new DriveSubsystem(hardwareMap, new Pose2d(0, 0, initialHeading()));
+        drive = new DriveSubsystem(hardwareMap, new Pose2d(0, 0, Math.toRadians(initialHeading())));
         actuator = new SlideSubsystem(hardwareMap);
         gripper = new GripperSubsystem(hardwareMap); gripper.closeClaw();
         wrist = new WristSubsystem(hardwareMap);
@@ -53,8 +53,8 @@ public abstract class AutoBaseClass extends CommandOpMode {
                 .build();
     }
 
-    private Command generateAutoPath(double initialSplineHeading, double spikeExtension, Vector2d spikeDepositPoint, Vector2d visionDeposit) {
-        Trajectory spike = drive.buildTrajectory(new Pose2d(0, 0, initialHeading()), initialSplineHeading)
+    protected Command generateAutoPath(double initialSplineHeading, double spikeExtension, Vector2d spikeDepositPoint, Vector2d visionDeposit) {
+        Trajectory spike = drive.buildTrajectory(new Pose2d(0, 0, Math.toRadians(initialHeading())), initialSplineHeading)
                 .splineToSplineHeading(intermediateSpikePoint())
                 .splineToConstantHeading(spikeDepositPoint, 0)
                 .build();
@@ -96,8 +96,24 @@ public abstract class AutoBaseClass extends CommandOpMode {
         );
     }
 
+    @Override
+    public void begin() {
+        onStart();
+    }
+
     protected abstract Knot intermediateSpikePoint();
     protected abstract TeamElementDetectionPipeline.Alliance getAlliance();
-    /** In radians */
+    /** In degrees */
     protected abstract double initialHeading();
+
+    protected abstract void onInit();
+    protected abstract void onStart();
+
+    protected final TeamElementDetectionPipeline.Detection getVisionDetection() {
+        return elementDetection.getDetection();
+    }
+
+    protected final void disableWebcam() {
+        portal.setProcessorEnabled(elementDetection, false);
+    }
 }
